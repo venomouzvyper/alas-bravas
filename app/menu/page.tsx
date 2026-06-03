@@ -2,13 +2,32 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MenuPageClient } from "@/components/sections/MenuPageClient";
+import { getSupabase } from "@/lib/supabase";
+import { MENU_ITEMS, type ItemMenu } from "@/lib/menu-data";
 
 export const metadata: Metadata = {
   title: "Menú — Alas Bravas",
   description: "Alitas BB o Búfalo, carnes, tajadas, pupusas y promos especiales. Alas Bravas, La Cabaña, San Lorenzo.",
 };
 
-export default function MenuPage() {
+async function fetchMenuItems(): Promise<ItemMenu[]> {
+  const supabase = getSupabase();
+  if (!supabase) return MENU_ITEMS;
+
+  const { data, error } = await supabase
+    .from("menu_items")
+    .select("*")
+    .eq("activo", true)
+    .order("orden");
+
+  if (error || !data || data.length === 0) return MENU_ITEMS;
+
+  return data as ItemMenu[];
+}
+
+export default async function MenuPage() {
+  const items = await fetchMenuItems();
+
   return (
     <>
       <Header />
@@ -35,8 +54,7 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* Contenido interactivo con filtros */}
-        <MenuPageClient />
+        <MenuPageClient items={items} />
       </main>
       <Footer />
     </>

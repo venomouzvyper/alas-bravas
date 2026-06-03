@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 
@@ -13,6 +14,7 @@ const navLinks = [
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-brand-dark/90 backdrop-blur-md border-b border-brand-gray-800">
@@ -49,14 +51,15 @@ export function Header() {
 
           {/* CTA + hamburger */}
           <div className="flex items-center gap-3">
-            <Button
-              variant="primary"
-              size="sm"
-              className="hidden md:inline-flex"
-              onClick={() => document.getElementById("reservaciones")?.scrollIntoView({ behavior: "smooth" })}
-            >
-              Reservar
-            </Button>
+            <Link href="/reservaciones" className="hidden md:inline-flex">
+              <Button
+                variant="primary"
+                size="sm"
+                className={pathname === "/reservaciones" ? "opacity-70 pointer-events-none" : ""}
+              >
+                Reservar
+              </Button>
+            </Link>
             <button
               className="md:hidden text-brand-cream p-2"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -83,9 +86,11 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <Button variant="primary" size="md" className="w-full mt-2">
-            Reservar Mesa
-          </Button>
+          <Link href="/reservaciones" onClick={() => setMenuOpen(false)}>
+            <Button variant="primary" size="md" className="w-full mt-2">
+              Reservar Mesa
+            </Button>
+          </Link>
         </div>
       )}
     </header>

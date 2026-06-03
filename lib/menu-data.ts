@@ -6,7 +6,7 @@ export interface ItemMenu {
   nombre: string;
   descripcion: string;
   precio: number;
-  acompañamientos?: string[];
+  acompanamientos?: string[];
   dia?: string;
   spice?: 'mild' | 'medium' | 'hot';
   emoji: string;
@@ -45,7 +45,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: 'Carne de Cerdo con Chorizo',
     descripcion: 'Carne de asada de cerdo y chorizo a la parrilla.',
     precio: 160,
-    acompañamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
+    acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     emoji: '🥩',
     gradientFrom: '#1A0800',
     gradientTo: '#8B3A0F',
@@ -56,7 +56,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: 'Chuleta Asada con Chorizo',
     descripcion: 'Chuleta asada a la perfección con chorizo artesanal.',
     precio: 160,
-    acompañamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
+    acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     emoji: '🍖',
     gradientFrom: '#200A00',
     gradientTo: '#7A2B00',
@@ -68,7 +68,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: 'Tajadas Preparadas',
     descripcion: 'Tajadas fritas servidas con todos los extras de la casa.',
     precio: 90,
-    acompañamientos: ['Carne molida', 'Ensalada', 'Encurtido', 'Aderezo'],
+    acompanamientos: ['Carne molida', 'Ensalada', 'Encurtido', 'Aderezo'],
     emoji: '🍌',
     gradientFrom: '#1A1400',
     gradientTo: '#856404',
@@ -80,7 +80,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: '3 Pupusas de Quesillo',
     descripcion: 'Rellenas de quesillo derretido. Especial Mié y Jue.',
     precio: 100,
-    acompañamientos: ['Salsa', 'Ensalada', 'Encurtido'],
+    acompanamientos: ['Salsa', 'Ensalada', 'Encurtido'],
     dia: 'Mié / Jue',
     emoji: '🫓',
     gradientFrom: '#1A1200',
@@ -92,7 +92,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: '3 Pupusas de Chicharrón',
     descripcion: 'Rellenas de chicharrón crujiente. Especial Mié y Jue.',
     precio: 110,
-    acompañamientos: ['Salsa', 'Ensalada', 'Encurtido'],
+    acompanamientos: ['Salsa', 'Ensalada', 'Encurtido'],
     dia: 'Mié / Jue',
     emoji: '🫓',
     gradientFrom: '#200E00',
@@ -116,7 +116,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: '2 Platos: Chuleta con Chorizo',
     descripcion: 'Dos chuletas asadas con chorizo. ¡Solo los viernes!',
     precio: 300,
-    acompañamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
+    acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     dia: 'Viernes',
     emoji: '🎉',
     gradientFrom: '#1A0400',
@@ -128,7 +128,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: '2 Platos: Carne de Cerdo con Chorizo',
     descripcion: 'Dos platos de carne de cerdo + chorizo. Solo los viernes.',
     precio: 300,
-    acompañamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
+    acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     dia: 'Viernes',
     emoji: '🎉',
     gradientFrom: '#1A0600',
@@ -140,7 +140,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: '14 Alitas BB o Búfalo',
     descripcion: 'La promo del miércoles y jueves para compartir.',
     precio: 300,
-    acompañamientos: ['Papas', 'Kétchup', 'Aderezo de la casa'],
+    acompanamientos: ['Papas', 'Kétchup', 'Aderezo de la casa'],
     dia: 'Mié / Jue',
     spice: 'medium',
     emoji: '🔥',
@@ -153,7 +153,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     nombre: '7 Alitas BB o Búfalo',
     descripcion: 'Promo personal de miércoles y jueves.',
     precio: 180,
-    acompañamientos: ['Papas', 'Kétchup', 'Aderezo de la casa'],
+    acompanamientos: ['Papas', 'Kétchup', 'Aderezo de la casa'],
     dia: 'Mié / Jue',
     spice: 'medium',
     emoji: '🔥',

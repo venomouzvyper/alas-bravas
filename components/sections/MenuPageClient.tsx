@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MENU_ITEMS, CATEGORIAS, type Categoria } from "@/lib/menu-data";
+import { CATEGORIAS, type ItemMenu, type Categoria } from "@/lib/menu-data";
 import { SpiceBadge } from "@/components/ui/Badge";
 
-export function MenuPageClient() {
+interface Props {
+  items: ItemMenu[];
+}
+
+export function MenuPageClient({ items }: Props) {
   const [categoriaActiva, setCategoriaActiva] = useState<Categoria | "todos">("todos");
 
   const itemsFiltrados =
     categoriaActiva === "todos"
-      ? MENU_ITEMS
-      : MENU_ITEMS.filter((item) => item.categoria === categoriaActiva);
+      ? items
+      : items.filter((item) => item.categoria === categoriaActiva);
 
   return (
     <section className="bg-brand-dark px-4 pb-20">
@@ -77,9 +81,9 @@ export function MenuPageClient() {
                   <p className="text-brand-cream/55 text-sm leading-relaxed mb-3">
                     {item.descripcion}
                   </p>
-                  {item.acompañamientos && (
+                  {item.acompanamientos && (
                     <p className="text-brand-cream/35 text-xs mb-3 leading-relaxed">
-                      Incluye: {item.acompañamientos.join(" · ")}
+                      Incluye: {item.acompanamientos.join(" · ")}
                     </p>
                   )}
                   <p className="font-display text-3xl text-brand-accent tracking-wider">
