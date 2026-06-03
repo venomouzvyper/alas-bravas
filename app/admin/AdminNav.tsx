@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/admin', label: 'Dashboard' },
   { href: '/admin/reservaciones', label: 'Reservaciones' },
   { href: '/admin/menu', label: 'Menú' },
+  { href: '/admin/galeria', label: 'Galería' },
 ];
 
 export function AdminNav() {

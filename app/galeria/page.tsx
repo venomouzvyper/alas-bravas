@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { getSupabase } from "@/lib/supabase";
 
 export const metadata: Metadata = {
   title: "Galería",
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
-const FOTOS = [
+// Fotos estáticas que siempre aparecen (las del lanzamiento)
+const FOTOS_ESTATICAS = [
   {
     src: "/galeria/restaurante-noche.jpg",
     alt: "Interior de Alas Bravas de noche — luces, mesas y ambiente",
@@ -46,7 +48,23 @@ const FOTOS = [
   },
 ];
 
-export default function GaleriaPage() {
+async function getDynamicPhotos() {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data } = await supabase
+    .from('gallery_photos')
+    .select('id, url, titulo')
+    .eq('activo', true)
+    .order('orden')
+    .order('created_at', { ascending: false });
+
+  return data ?? [];
+}
+
+export default async function GaleriaPage() {
+  const dynamic = await getDynamicPhotos();
+
   return (
     <>
       <Header />
@@ -70,10 +88,31 @@ export default function GaleriaPage() {
           </div>
         </section>
 
-        {/* Columnas masonry — cada foto a su tamaño natural */}
         <section className="px-4 pb-20">
           <div className="max-w-4xl mx-auto columns-1 sm:columns-2 gap-4">
-            {FOTOS.map((foto) => (
+            {/* Fotos dinámicas de Cloudinary primero */}
+            {dynamic.map((foto) => (
+              <div key={foto.id} className="break-inside-avoid mb-4">
+                <div className="relative overflow-hidden rounded-sm border border-white/5 group">
+                  <Image
+                    src={foto.url}
+                    alt={foto.titulo ?? 'Foto de Alas Bravas'}
+                    width={800}
+                    height={600}
+                    className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
+                  {foto.titulo && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-dark/80 to-transparent px-4 py-3">
+                      <p className="text-brand-cream text-sm font-medium">{foto.titulo}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Fotos estáticas del lanzamiento */}
+            {FOTOS_ESTATICAS.map((foto) => (
               <div key={foto.src} className="break-inside-avoid mb-4">
                 <div className="relative overflow-hidden rounded-sm border border-white/5 group">
                   <Image
