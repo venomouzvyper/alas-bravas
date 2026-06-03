@@ -4,6 +4,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { getSupabase } from "@/lib/supabase";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Galería",
   description: "Fotos del ambiente, menú y promos de Alas Bravas en La Cabaña, San Lorenzo.",
