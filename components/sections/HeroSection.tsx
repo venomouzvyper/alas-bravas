@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmberParticles } from "@/components/ui/EmberParticles";
 
 export function HeroSection() {
   return (
@@ -46,6 +47,9 @@ export function HeroSection() {
         {/* Oscurecimiento para legibilidad */}
         <div className="absolute inset-0 bg-brand-dark/45" />
       </div>
+
+      {/* Brasas flotantes */}
+      <EmberParticles />
 
       {/* Contenido */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-24 pb-36">
