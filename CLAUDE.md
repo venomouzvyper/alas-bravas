@@ -1,3 +1,4 @@
+
 # Alas Bravas — Bitácora del Proyecto
 
 ## Regla de oro
@@ -87,7 +88,7 @@ Control:     Git local → GitHub (venomouzvyper/alas-bravas) → Vercel auto-de
 ## URLs del proyecto
 | Entorno | URL |
 |---------|-----|
-| Producción | https://alasbravashn.com (pendiente conectar DNS) |
+| Producción | https://alasbravashn.com (DNS en Hostinger — pendiente conectar a Vercel) |
 | Preview Vercel | https://alas-bravas.vercel.app (disponible tras primer deploy) |
 | Repositorio | https://github.com/venomouzvyper/alas-bravas |
 
