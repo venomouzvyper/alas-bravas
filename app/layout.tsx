@@ -3,6 +3,7 @@ import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { RestaurantJsonLd } from "@/components/layout/RestaurantJsonLd";
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas",
@@ -16,7 +17,7 @@ const inter = Inter({
 });
 
 const BASE_URL = "https://www.alasbravashn.com";
-const OG_IMAGE = "/galeria/promo-alitas-miercoles.jpg";
+const OG_IMAGE = "/galeria/restaurante-noche.jpg";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -64,6 +65,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col antialiased">
         <GoogleAnalytics />
+        <RestaurantJsonLd />
         {children}
         <WhatsAppButton />
       </body>

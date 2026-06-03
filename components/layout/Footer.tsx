@@ -47,7 +47,14 @@ export function Footer() {
               Encuéntranos
             </h3>
             <address className="not-italic space-y-2 text-sm text-brand-cream/60">
-              <p>📍 La Cabaña, San Lorenzo</p>
+              <a
+                href="https://maps.app.goo.gl/6mF7ZbRwVntGKyQA6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand-accent transition-colors"
+              >
+                📍 Playa La Cabaña, San Lorenzo
+              </a>
               <p>🕐 Lun – Dom: 1:00 PM – 11:00 PM</p>
               <p>🛵 Delivery vía <span className="text-brand-cream/80">Mandaditos</span></p>
             </address>

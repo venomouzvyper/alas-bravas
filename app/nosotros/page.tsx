@@ -64,22 +64,15 @@ export default function NosotrosPage() {
         <section className="px-4 pb-20">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
-              {/* Logo */}
-              <div className="flex justify-center">
-                <div className="relative">
-                  <div
-                    className="absolute inset-0 rounded-full blur-3xl opacity-30"
-                    style={{ background: "radial-gradient(circle, #E85D04, #C1121F)" }}
-                  />
-                  <Image
-                    src="/logo.jpg"
-                    alt="Logo Alas Bravas"
-                    width={320}
-                    height={320}
-                    className="relative z-10 object-contain rounded-2xl border-4 border-brand-accent/30 shadow-2xl"
-                    priority
-                  />
-                </div>
+              {/* Foto del restaurante */}
+              <div className="relative overflow-hidden rounded-xl border border-white/10 shadow-2xl aspect-[4/3]">
+                <Image
+                  src="/galeria/restaurante-noche.jpg"
+                  alt="Interior de Alas Bravas de noche"
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
 
               {/* Texto */}
@@ -127,17 +120,17 @@ export default function NosotrosPage() {
             </div>
 
             {/* Info de contacto */}
-            <div className="border-t border-brand-gray-800 pt-16 mt-16">
+            <div className="border-t border-white/10 pt-16 mt-16">
               <h2 className="font-display text-4xl sm:text-5xl text-brand-cream tracking-wider text-center mb-12 leading-none">
                 ENCUÉNTRANOS
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center mb-10">
                 {[
-                  { icon: "📍", titulo: "Ubicación", detalle: "La Cabaña, San Lorenzo" },
+                  { icon: "📍", titulo: "Ubicación", detalle: "Playa La Cabaña\nSan Lorenzo, Valle" },
                   { icon: "🕐", titulo: "Horario", detalle: "Lun — Dom\n1:00 PM — 11:00 PM" },
                   { icon: "🛵", titulo: "Delivery", detalle: "Pide por Mandaditos" },
                 ].map(({ icon, titulo, detalle }) => (
-                  <div key={titulo} className="p-6 rounded-sm border border-brand-gray-800 bg-brand-gray-900">
+                  <div key={titulo} className="p-6 rounded-xl border border-white/10">
                     <span className="text-3xl block mb-3">{icon}</span>
                     <p className="font-display text-lg text-brand-accent tracking-widest uppercase mb-2">
                       {titulo}
@@ -145,6 +138,29 @@ export default function NosotrosPage() {
                     <p className="text-brand-cream/70 text-sm whitespace-pre-line">{detalle}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Mapa embebido */}
+              <div className="rounded-xl overflow-hidden border border-white/10">
+                <iframe
+                  src="https://maps.google.com/maps?q=13.4148563,-87.4450208&z=17&output=embed&hl=es"
+                  width="100%"
+                  height="340"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Ubicación de Alas Bravas en Google Maps"
+                  className="block"
+                />
+              </div>
+              <div className="text-center mt-4">
+                <a
+                  href="https://maps.app.goo.gl/6mF7ZbRwVntGKyQA6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-accent hover:text-brand-secondary text-sm transition-colors"
+                >
+                  Abrir en Google Maps →
+                </a>
               </div>
             </div>
           </div>
