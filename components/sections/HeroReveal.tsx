@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type Phase = 'idle' | 'burning' | 'flash' | 'revealed';
@@ -77,39 +78,30 @@ export function HeroReveal() {
         </div>
       )}
 
-      {/* ── REVEALED: título limpio + botones ── */}
+      {/* ── REVEALED: logo + botones ── */}
       {phase === 'revealed' && (
         <div
           className="flex flex-col items-center text-center w-full"
           style={{ animation: 'impact-shake 0.45s ease both' }}
         >
-          {/* Título en Rubik Dirt */}
-          <div className="overflow-hidden mb-1">
-            <h1
-              className="text-[clamp(5rem,19vw,12rem)] text-brand-cream leading-none"
-              style={{
-                fontFamily: 'var(--font-rubik-dirt)',
-                animation: 'title-impact 0.7s cubic-bezier(0.22,1,0.36,1) both',
-              }}
-            >
-              ALAS
-            </h1>
-          </div>
-          <div className="overflow-hidden mb-12">
-            <h1
-              className="text-[clamp(5rem,19vw,12rem)] text-brand-primary leading-none"
-              style={{
-                fontFamily: 'var(--font-rubik-dirt)',
-                animation: 'title-impact 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both',
-              }}
-            >
-              BRAVAS
-            </h1>
+          {/* Logo */}
+          <div
+            className="overflow-hidden"
+            style={{ animation: 'title-impact 0.7s cubic-bezier(0.22,1,0.36,1) both' }}
+          >
+            <Image
+              src="/logo-hero.png"
+              alt="Alas Bravas"
+              width={520}
+              height={520}
+              priority
+              className="w-[260px] sm:w-[360px] md:w-[460px] h-auto mix-blend-screen drop-shadow-[0_0_40px_rgba(232,93,4,0.5)]"
+            />
           </div>
 
           {/* CTAs */}
           <div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
             style={{ animation: 'reveal-fade-up 0.5s ease 0.6s both' }}
           >
             <Link
@@ -125,7 +117,6 @@ export function HeroReveal() {
               Reservar
             </Link>
           </div>
-
         </div>
       )}
     </div>
