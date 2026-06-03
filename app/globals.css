@@ -34,3 +34,9 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #1A0A00; }
 ::-webkit-scrollbar-thumb { background: #C1121F; border-radius: 3px; }
+
+/* Ticker animado */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

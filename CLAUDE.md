@@ -5,8 +5,8 @@
 Un hito no está completo hasta que su criterio de éxito está **verificado visualmente o funcionalmente**. No se avanza sin el tag de git correspondiente.
 
 ## Estado actual
-- **Hito activo:** Hito 1 — La Fachada y Estructura
-- **Última sesión:** Hito 0 completado y taggeado (`hito-0`)
+- **Hito activo:** Hito 2 — Las Habitaciones
+- **Última sesión:** Hito 1 completado y taggeado (`hito-1`)
 
 ---
 
@@ -15,7 +15,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 | # | Nombre | Estado | Tag git |
 |---|--------|--------|---------|
 | 0 | El Terreno | ✅ Completo | `hito-0` |
-| 1 | La Fachada y Estructura | 🔲 Pendiente | — |
+| 1 | La Fachada y Estructura | ✅ Completo | `hito-1` |
 | 2 | Las Habitaciones | 🔲 Pendiente | — |
 | 3 | Las Tuberías (Base de datos) | 🔲 Pendiente | — |
 | 4 | El Panel de Control (Admin) | 🔲 Pendiente | — |
@@ -54,22 +54,25 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ---
 
-## Hito 1 — La Fachada y Estructura 🔲
+## Hito 1 — La Fachada y Estructura ✅
 
-### Tareas pendientes
-- [ ] Hero section con video en loop, texto de impacto y CTA primario
-- [ ] Ticker de urgencia animado (banda horizontal continua)
-- [ ] Vista rápida del menú (4–6 platos destacados con foto y precio)
-- [ ] Animaciones de entrada con Framer Motion
-- [ ] Diseño 100% responsive verificado en mobile
-- [ ] Eliminar el showcase de Design System de `app/page.tsx`
+**Criterio de éxito cumplido:** Build limpio + screenshots aprobados en desktop (1280px) y mobile (390px). Un visitante en 3 segundos ya quiere comer alitas.
 
-### Criterio de éxito
-Un visitante que llega al sitio en 3 segundos ya quiere comer alitas.
-Screenshots aprobados en desktop y mobile. Build limpio. Tag: `hito-1`.
+### Qué se construyó
+- `HeroSection` — gradiente ember animado (Framer Motion), tipografía Bebas Neue masiva, slot de video listo para MP4, scroll indicator
+- `UrgencyTicker` — banda roja `brand-primary` con 6 mensajes en loop continuo (CSS keyframes)
+- `MenuPreview` — grid 3 cols desktop / 1 col mobile, 6 platos con gradientes de calor, `SpiceBadge`, precios en `brand-accent`
+- `app/page.tsx` limpiado — design system showcase eliminado
+- `globals.css` — `@keyframes marquee` añadido
 
-### Bloqueantes conocidos
-- **Video del hero**: el usuario debe proveer el archivo de video (MP4, ~10–30s, grabado en el restaurante o stock footage). Sin este archivo, el Hero se construye con fallback de imagen estática.
+### Archivos clave
+- `components/sections/HeroSection.tsx`
+- `components/sections/UrgencyTicker.tsx`
+- `components/sections/MenuPreview.tsx`
+
+### Pendiente para cuando haya activos
+- **Video del hero**: descomentar el slot en `HeroSection.tsx` y colocar MP4 en `public/video/hero.mp4`
+- **Fotos de platos**: reemplazar gradientes/emoji por imágenes reales en Hito 3 (Cloudinary)
 
 ---
 
