@@ -104,7 +104,7 @@ export function ReservacionForm() {
           name="telefono"
           type="tel"
           required
-          placeholder="+504 0000-0000"
+          placeholder="Ej: 9999-9999"
           className={inputClass}
         />
       </div>

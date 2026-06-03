@@ -22,7 +22,7 @@ const OG_IMAGE = "/galeria/restaurante-noche.jpg";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Alas Bravas — Las Mejores Alitas de Honduras",
+    default: "Alas Bravas — Las Mejores Alitas del Sur",
     template: "%s | Alas Bravas",
   },
   description:
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     locale: "es_HN",
     url: BASE_URL,
     siteName: "Alas Bravas",
-    title: "Alas Bravas — Las Mejores Alitas de Honduras",
+    title: "Alas Bravas — Las Mejores Alitas del Sur",
     description:
       "Alitas crujientes, salsas explosivas y sabores que no olvidarás. La Cabaña, San Lorenzo.",
     images: [
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alas Bravas — Las Mejores Alitas de Honduras",
+    title: "Alas Bravas — Las Mejores Alitas del Sur",
     description: "Alitas crujientes, salsas explosivas. La Cabaña, San Lorenzo.",
     images: [OG_IMAGE],
   },
-  keywords: ["alitas", "alas bravas", "restaurante", "San Lorenzo", "Honduras", "alitas de pollo"],
+  keywords: ["alitas", "alas bravas", "restaurante", "San Lorenzo", "Valle", "sur de Honduras", "alitas de pollo", "La Cabaña"],
 };
 
 export default function RootLayout({

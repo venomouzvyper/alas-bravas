@@ -18,58 +18,33 @@ const FOTOS = [
     src: "/galeria/restaurante-noche.jpg",
     alt: "Interior de Alas Bravas de noche — luces, mesas y ambiente",
     titulo: "Nuestro espacio",
-    subtitulo: "Un ambiente que invita a quedarse",
-    cols: 2,
+    width: 1280, height: 960,
+  },
+  {
+    src: "/galeria/promo-alitas-miercoles.jpg",
+    alt: "Promoción Miércoles y Jueves — 14 Alitas por L.300",
+    titulo: "Promo Mié y Jue — 14 alitas por L.300",
+    width: 758, height: 906,
   },
   {
     src: "/galeria/restaurante-exterior.jpg",
     alt: "Exterior de Alas Bravas al atardecer en Playa La Cabaña",
     titulo: "Frente a la playa",
-    subtitulo: "Playa La Cabaña, San Lorenzo",
-    cols: 1,
-  },
-  {
-    src: "/galeria/promo-alitas-miercoles.jpg",
-    alt: "Promoción Miércoles y Jueves — 14 Alitas por L.300",
-    titulo: "Promo Mié y Jue",
-    subtitulo: "14 alitas por L.300",
-    cols: 1,
+    width: 1079, height: 1439,
   },
   {
     src: "/galeria/promo-pupusas.jpg",
     alt: "Pupusas especiales — Miércoles y Jueves",
-    titulo: "Pupusas especiales",
-    subtitulo: "Desde L.100 los Mié y Jue",
-    cols: 1,
+    titulo: "Pupusas especiales Mié y Jue desde L.100",
+    width: 1024, height: 1535,
   },
   {
     src: "/galeria/super-menu.jpg",
     alt: "Súper Menú Alas Bravas",
-    titulo: "Súper Menú",
-    subtitulo: "Alitas, carnes, tajadas y más",
-    cols: 1,
+    titulo: "Súper Menú completo",
+    width: 1024, height: 1536,
   },
 ];
-
-function FotoCard({ foto, className = "" }: { foto: (typeof FOTOS)[0]; className?: string }) {
-  return (
-    <div className={`group relative overflow-hidden rounded-sm border border-white/5 hover:border-brand-primary/40 transition-colors ${className}`}>
-      <div className="relative w-full h-full min-h-[220px]">
-        <Image
-          src={foto.src}
-          alt={foto.alt}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, 50vw"
-        />
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-dark/90 to-transparent p-4">
-        <p className="font-display text-lg text-brand-cream tracking-wide">{foto.titulo}</p>
-        <p className="text-brand-accent text-sm">{foto.subtitulo}</p>
-      </div>
-    </div>
-  );
-}
 
 export default function GaleriaPage() {
   return (
@@ -95,21 +70,26 @@ export default function GaleriaPage() {
           </div>
         </section>
 
-        {/* Grid */}
+        {/* Columnas masonry — cada foto a su tamaño natural */}
         <section className="px-4 pb-20">
-          <div className="max-w-5xl mx-auto space-y-4">
-            {/* Fila 1: foto noche (grande) + exterior */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 h-auto sm:h-72">
-              <FotoCard foto={FOTOS[0]} className="sm:col-span-2" />
-              <FotoCard foto={FOTOS[1]} />
-            </div>
-
-            {/* Fila 2: tres fotos de promos */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 h-auto sm:h-64">
-              <FotoCard foto={FOTOS[2]} />
-              <FotoCard foto={FOTOS[3]} />
-              <FotoCard foto={FOTOS[4]} />
-            </div>
+          <div className="max-w-4xl mx-auto columns-1 sm:columns-2 gap-4">
+            {FOTOS.map((foto) => (
+              <div key={foto.src} className="break-inside-avoid mb-4">
+                <div className="relative overflow-hidden rounded-sm border border-white/5 group">
+                  <Image
+                    src={foto.src}
+                    alt={foto.alt}
+                    width={foto.width}
+                    height={foto.height}
+                    className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-dark/80 to-transparent px-4 py-3">
+                    <p className="text-brand-cream text-sm font-medium">{foto.titulo}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </main>

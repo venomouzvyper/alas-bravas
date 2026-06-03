@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 
 const WA_LINK =
-  'https://wa.me/50432462305?text=Hola%2C%20me%20comunico%20desde%20Alas%20Bravas%20%F0%9F%8D%97';
+  'https://wa.me/50432462305?text=Hola%2C%20vi%20su%20p%C3%A1gina%20web%20y%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20Alas%20Bravas%20%F0%9F%8D%97';
 
 export function WhatsAppButton() {
   const pathname = usePathname();

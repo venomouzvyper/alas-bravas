@@ -83,7 +83,7 @@ export default function NosotrosPage() {
                 </h2>
                 <p className="text-brand-cream/70 leading-relaxed mb-4">
                   Alas Bravas nació en La Cabaña, San Lorenzo, con una misión simple: servir las mejores
-                  alitas de Honduras. Lo que empezó como un amor por el sabor auténtico se convirtió en
+                  alitas del sur de Honduras. Lo que empezó como un amor por el sabor auténtico se convirtió en
                   un lugar donde amigos y familias vienen a compartir momentos que no se olvidan.
                 </p>
                 <p className="text-brand-cream/70 leading-relaxed mb-8">
