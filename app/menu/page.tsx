@@ -6,8 +6,13 @@ import { getSupabase } from "@/lib/supabase";
 import { MENU_ITEMS, type ItemMenu } from "@/lib/menu-data";
 
 export const metadata: Metadata = {
-  title: "Menú — Alas Bravas",
+  title: "Menú",
   description: "Alitas BB o Búfalo, carnes, tajadas, pupusas y promos especiales. Alas Bravas, La Cabaña, San Lorenzo.",
+  openGraph: {
+    title: "Menú — Alas Bravas",
+    description: "Alitas BB o Búfalo, carnes, tajadas, pupusas y promos. ¡Ven a probarlas!",
+    images: [{ url: "/galeria/promo-alitas-miercoles.jpg" }],
+  },
 };
 
 async function fetchMenuItems(): Promise<ItemMenu[]> {

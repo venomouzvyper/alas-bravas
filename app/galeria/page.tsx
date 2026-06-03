@@ -4,8 +4,13 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Galería — Alas Bravas",
+  title: "Galería",
   description: "Fotos del menú, promos y el ambiente de Alas Bravas en La Cabaña, San Lorenzo.",
+  openGraph: {
+    title: "Galería — Alas Bravas",
+    description: "Mira nuestras promos, platos y el ambiente del restaurante.",
+    images: [{ url: "/galeria/promo-alitas-miercoles.jpg" }],
+  },
 };
 
 const FOTOS = [

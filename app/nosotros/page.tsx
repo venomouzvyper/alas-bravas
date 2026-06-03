@@ -5,8 +5,13 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Nosotros — Alas Bravas",
+  title: "Nosotros",
   description: "Conoce la historia de Alas Bravas, el restaurante de alitas en La Cabaña, San Lorenzo.",
+  openGraph: {
+    title: "Nuestra Historia — Alas Bravas",
+    description: "Nació en La Cabaña, San Lorenzo, con una misión: servir las mejores alitas de Honduras.",
+    images: [{ url: "/logo.jpg" }],
+  },
 };
 
 const VALORES = [

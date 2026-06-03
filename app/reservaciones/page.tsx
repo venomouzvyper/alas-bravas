@@ -4,8 +4,13 @@ import { Footer } from "@/components/layout/Footer";
 import { ReservacionForm } from "@/components/sections/ReservacionForm";
 
 export const metadata: Metadata = {
-  title: "Reservaciones — Alas Bravas",
-  description: "Reservá tu mesa en Alas Bravas. La Cabaña, San Lorenzo. Abierto 1 PM - 11 PM.",
+  title: "Reservaciones",
+  description: "Reservá tu mesa en Alas Bravas. La Cabaña, San Lorenzo. Abierto 1 PM – 11 PM.",
+  openGraph: {
+    title: "Reservá tu mesa — Alas Bravas",
+    description: "Asegura tu lugar. La Cabaña, San Lorenzo. Abierto 1 PM – 11 PM todos los días.",
+    images: [{ url: "/galeria/promo-alitas-miercoles.jpg" }],
+  },
 };
 
 export default function ReservacionesPage() {
