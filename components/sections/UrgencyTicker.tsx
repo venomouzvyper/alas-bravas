@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 const ITEMS = [
   "🍗 6 ALITAS DESDE L.180",
   "🔥 MIÉ Y JUE: 14 ALITAS POR L.300",
@@ -9,8 +11,21 @@ const ITEMS = [
   "🛵 PIDE POR MANDADITOS",
 ];
 
+const SPEED_PX_PER_SEC = 80;
+
 export function UrgencyTicker() {
+  const trackRef = useRef<HTMLDivElement>(null);
   const doubled = [...ITEMS, ...ITEMS];
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    // Mide el ancho real de UNA copia del contenido (la mitad del track duplicado)
+    const halfWidth = el.scrollWidth / 2;
+    const duration = halfWidth / SPEED_PX_PER_SEC;
+    el.style.animationDuration = `${duration}s`;
+  }, []);
 
   return (
     <div
@@ -18,6 +33,7 @@ export function UrgencyTicker() {
       aria-hidden="true"
     >
       <div
+        ref={trackRef}
         className="flex whitespace-nowrap"
         style={{ animation: "marquee 24s linear infinite" }}
       >
