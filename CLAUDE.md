@@ -5,8 +5,8 @@
 Un hito no está completo hasta que su criterio de éxito está **verificado visualmente o funcionalmente**. No se avanza sin el tag de git correspondiente.
 
 ## Estado actual
-- **Hito activo:** Hito 5 — Los Acabados Finales
-- **Última sesión:** Hito 4 completado y taggeado (`hito-4`)
+- **Hito activo:** Hito 6 — La Mudanza (Launch)
+- **Última sesión:** Hito 5 completado y taggeado (`hito-5`)
 
 ---
 
@@ -19,7 +19,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 | 2 | Las Habitaciones | ✅ Completo | `hito-2` |
 | 3 | Las Tuberías (Base de datos) | ✅ Completo | `hito-3` |
 | 4 | El Panel de Control (Admin) | ✅ Completo | `hito-4` |
-| 5 | Los Acabados Finales | 🔲 Pendiente | — |
+| 5 | Los Acabados Finales | ✅ Completo | `hito-5` |
 | 6 | La Mudanza (Launch) | 🔲 Pendiente | — |
 
 ---
@@ -119,6 +119,24 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 - Fotos individuales de platos → Cloudinary
 - Formulario de reservaciones con backend → Supabase
 - Datos del menú desde base de datos → reemplazar `lib/menu-data.ts`
+
+---
+
+## Hito 5 — Los Acabados Finales ✅
+
+**Criterio de éxito cumplido:** Lighthouse móvil — Performance 97, Accessibility 96, Best Practices 100, SEO 100. LCP 2.5s, TBT 60ms.
+
+### Qué se construyó
+- SEO completo: `metadataBase`, `openGraph` y `twitter` en todas las páginas públicas
+- `sitemap.xml` y `robots.txt` generados automáticamente por Next.js
+- PWA manifest (`/manifest.webmanifest`) — instalable en home screen
+- Google Analytics: componente listo, se activa con `NEXT_PUBLIC_GA_ID` en Vercel
+- Botón flotante de WhatsApp (+504 3246-2305), oculto en rutas `/admin`
+- Footer actualizado: datos reales (La Cabaña, 1–11 PM, Mandaditos) + Instagram `@alasbravas1709`
+- **Fix de LCP crítico:** HeroSection convertido a Server Component con CSS `@keyframes` puros — elimina Framer Motion del hero, LCP bajó de 4.0s a 2.5s, TBT de 160ms a 60ms
+
+### Pendiente
+- Google Analytics: crear propiedad GA4 en analytics.google.com y agregar `NEXT_PUBLIC_GA_ID` en Vercel
 
 ---
 
