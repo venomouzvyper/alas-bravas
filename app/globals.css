@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta Alas Bravas */
+  --color-brand-primary: #C1121F;
+  --color-brand-secondary: #E85D04;
+  --color-brand-accent: #FFB703;
+  --color-brand-dark: #0D0602;
+  --color-brand-cream: #FFF8F0;
+
+  /* Grises de apoyo oscuros */
+  --color-brand-gray-900: #1A0A00;
+  --color-brand-gray-800: #2A1400;
+  --color-brand-gray-700: #3D1F00;
+
+  /* Tipografías */
+  --font-display: var(--font-bebas);
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  --background: #0D0602;
+  --foreground: #FFF8F0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar con identidad de marca */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1A0A00; }
+::-webkit-scrollbar-thumb { background: #C1121F; border-radius: 3px; }
