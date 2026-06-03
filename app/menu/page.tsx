@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MenuPageClient } from "@/components/sections/MenuPageClient";
+import { WingCalculator } from "@/components/sections/WingCalculator";
 import { getSupabase } from "@/lib/supabase";
 import { MENU_ITEMS, type ItemMenu } from "@/lib/menu-data";
 
@@ -59,6 +60,7 @@ export default async function MenuPage() {
           </div>
         </div>
 
+        <WingCalculator />
         <MenuPageClient items={items} />
       </main>
       <Footer />

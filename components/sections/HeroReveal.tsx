@@ -126,18 +126,6 @@ export function HeroReveal() {
             </Link>
           </div>
 
-          {/* Scroll indicator */}
-          <div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            style={{ animation: 'hero-fade-in 0.6s ease 1.2s both' }}
-          >
-            <div
-              className="w-5 h-8 rounded-full border-2 border-brand-cream/20 flex items-start justify-center pt-1.5"
-              style={{ animation: 'hero-bounce 1.6s ease-in-out infinite' }}
-            >
-              <div className="w-1 h-1.5 rounded-full bg-brand-cream/40" />
-            </div>
-          </div>
         </div>
       )}
     </div>
