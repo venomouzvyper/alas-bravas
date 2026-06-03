@@ -5,8 +5,8 @@
 Un hito no está completo hasta que su criterio de éxito está **verificado visualmente o funcionalmente**. No se avanza sin el tag de git correspondiente.
 
 ## Estado actual
-- **Hito activo:** Hito 6 — La Mudanza (Launch)
-- **Última sesión:** Hito 5 completado y taggeado (`hito-5`)
+- **Hito activo:** — (todos los hitos completados ✅)
+- **Última sesión:** Hito 6 completado y taggeado (`hito-6`) — sitio lanzado
 
 ---
 
@@ -20,7 +20,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 | 3 | Las Tuberías (Base de datos) | ✅ Completo | `hito-3` |
 | 4 | El Panel de Control (Admin) | ✅ Completo | `hito-4` |
 | 5 | Los Acabados Finales | ✅ Completo | `hito-5` |
-| 6 | La Mudanza (Launch) | 🔲 Pendiente | — |
+| 6 | La Mudanza (Launch) | ✅ Completo | `hito-6` |
 
 ---
 
@@ -119,6 +119,25 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 - Fotos individuales de platos → Cloudinary
 - Formulario de reservaciones con backend → Supabase
 - Datos del menú desde base de datos → reemplazar `lib/menu-data.ts`
+
+---
+
+## Hito 6 — La Mudanza ✅
+
+**Criterio de éxito cumplido:** Sitio live en `alasbravashn.com` con fotos reales, ubicación en Maps, datos estructurados para Google, y dominio + SSL activos.
+
+### Qué se construyó
+- `public/galeria/restaurante-noche.jpg` + `restaurante-exterior.jpg` — fotos reales del local integradas
+- `app/galeria/page.tsx` — galería actualizada con 5 fotos (2 reales + 3 de menú)
+- `app/nosotros/page.tsx` — foto real del restaurante reemplaza el logo en la sección historia
+- `app/nosotros/page.tsx` — Google Maps embebido con ubicación exacta (Playa La Cabaña, 13.4148563, -87.4450208)
+- `components/layout/RestaurantJsonLd.tsx` — Schema.org Restaurant: nombre, dirección, coordenadas, horario, teléfono, Instagram
+- `components/layout/Footer.tsx` — link directo a Google Maps
+- OG image actualizada a la foto del restaurante de noche
+
+### Pendiente post-launch
+- Crear propiedad GA4 y agregar `NEXT_PUBLIC_GA_ID` en Vercel
+- Post de lanzamiento en Instagram `@alasbravas1709`
 
 ---
 
