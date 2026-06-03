@@ -5,8 +5,8 @@
 Un hito no está completo hasta que su criterio de éxito está **verificado visualmente o funcionalmente**. No se avanza sin el tag de git correspondiente.
 
 ## Estado actual
-- **Hito activo:** Hito 2 — Las Habitaciones
-- **Última sesión:** Hito 1 completado y taggeado (`hito-1`)
+- **Hito activo:** Hito 3 — Las Tuberías (Base de datos)
+- **Última sesión:** Hito 2 completado y taggeado (`hito-2`)
 
 ---
 
@@ -16,7 +16,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 |---|--------|--------|---------|
 | 0 | El Terreno | ✅ Completo | `hito-0` |
 | 1 | La Fachada y Estructura | ✅ Completo | `hito-1` |
-| 2 | Las Habitaciones | 🔲 Pendiente | — |
+| 2 | Las Habitaciones | ✅ Completo | `hito-2` |
 | 3 | Las Tuberías (Base de datos) | 🔲 Pendiente | — |
 | 4 | El Panel de Control (Admin) | 🔲 Pendiente | — |
 | 5 | Los Acabados Finales | 🔲 Pendiente | — |
@@ -73,6 +73,52 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 ### Pendiente para cuando haya activos
 - **Video del hero**: descomentar el slot en `HeroSection.tsx` y colocar MP4 en `public/video/hero.mp4`
 - **Fotos de platos**: reemplazar gradientes/emoji por imágenes reales en Hito 3 (Cloudinary)
+
+---
+
+## Hito 2 — Las Habitaciones ✅
+
+**Criterio de éxito cumplido:** Build limpio + 3 páginas nuevas con navegación funcional, datos reales del menú y fotos del restaurante integradas.
+
+### Qué se construyó
+- `app/menu/page.tsx` — menú completo con hero, tabs de categoría y grid filtrable (client-side)
+- `app/nosotros/page.tsx` — historia del restaurante, valores y datos de contacto con logo real
+- `app/galeria/page.tsx` — galería con fotos promocionales reales
+- `components/sections/MenuPageClient.tsx` — lógica de filtrado por categoría con AnimatePresence
+- `lib/menu-data.ts` — datos reales del menú extraídos del Súper Menú oficial
+- Header actualizado con logo real (`/logo.jpg`)
+- `MenuPreview` y `UrgencyTicker` actualizados con precios y datos reales
+
+### Datos reales del menú
+| Ítem | Precio |
+|------|--------|
+| 6 Alitas BB o Búfalo | L.180 |
+| 12 Alitas BB o Búfalo | L.320 |
+| Carne de Cerdo con Chorizo | L.160 |
+| Chuleta Asada con Chorizo | L.160 |
+| Tajadas Preparadas | L.90 |
+| 3 Pupusas de Quesillo (Mié/Jue) | L.100 |
+| 3 Pupusas de Chicharrón (Mié/Jue) | L.110 |
+| Refresco portátil | L.30 |
+| Promo Viernes: 2 platos | L.300 |
+| Promo Mié/Jue: 14 alitas | L.300 |
+| Promo Mié/Jue: 7 alitas | L.180 |
+
+### Info del restaurante (confirmada)
+- **Ubicación:** La Cabaña, San Lorenzo
+- **Horario:** 1 PM — 11 PM
+- **Delivery:** Mandaditos
+
+### Imágenes integradas
+- `public/logo.jpg` — logotipo oficial
+- `public/galeria/promo-alitas-miercoles.jpg`
+- `public/galeria/super-menu.jpg`
+- `public/galeria/promo-pupusas.jpg`
+
+### Pendiente para Hito 3
+- Fotos individuales de platos → Cloudinary
+- Formulario de reservaciones con backend → Supabase
+- Datos del menú desde base de datos → reemplazar `lib/menu-data.ts`
 
 ---
 

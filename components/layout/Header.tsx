@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 
@@ -20,7 +21,15 @@ export function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-display text-2xl text-brand-cream tracking-wider leading-none">
+            <Image
+              src="/logo.jpg"
+              alt="Alas Bravas"
+              width={48}
+              height={48}
+              className="object-contain rounded-sm"
+              priority
+            />
+            <span className="font-display text-xl text-brand-cream tracking-wider leading-none">
               ALAS<span className="text-brand-primary"> BRAVAS</span>
             </span>
           </Link>
