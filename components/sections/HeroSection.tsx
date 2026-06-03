@@ -28,16 +28,17 @@ export function HeroSection() {
           }}
         />
 
-        {/* Glow flotante animado */}
+        {/* Glow flotante — opacity-only para no forzar repaint */}
         <motion.div
           className="absolute inset-0"
-          animate={{
-            background: [
-              "radial-gradient(ellipse 55% 45% at 22% 58%, rgba(193,18,31,0.16) 0%, transparent 70%)",
-              "radial-gradient(ellipse 55% 45% at 78% 42%, rgba(232,93,4,0.16) 0%, transparent 70%)",
-              "radial-gradient(ellipse 55% 45% at 22% 58%, rgba(193,18,31,0.16) 0%, transparent 70%)",
-            ],
-          }}
+          style={{ background: "radial-gradient(ellipse 55% 45% at 22% 58%, rgba(193,18,31,0.16) 0%, transparent 70%)" }}
+          animate={{ opacity: [1, 0, 1] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(ellipse 55% 45% at 78% 42%, rgba(232,93,4,0.16) 0%, transparent 70%)" }}
+          animate={{ opacity: [0, 1, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
         />
 
