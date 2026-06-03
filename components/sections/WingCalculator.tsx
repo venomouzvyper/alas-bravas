@@ -5,9 +5,8 @@ import { useState } from 'react';
 const PRICE_12 = 320;
 const PRICE_6  = 180;
 
-function calcular(personas: number, hambre: boolean) {
-  const porPersona = hambre ? 8 : 6;
-  const total = personas * porPersona;
+function calcular(personas: number) {
+  const total   = personas * 6;
   const packs12 = Math.floor(total / 12);
   const resto   = total % 12;
   const packs6  = resto > 0 ? 1 : 0;
@@ -18,9 +17,8 @@ function calcular(personas: number, hambre: boolean) {
 
 export function WingCalculator() {
   const [personas, setPersonas] = useState(2);
-  const [hambre, setHambre]     = useState(false);
 
-  const { packs12, packs6, precio, alitas } = calcular(personas, hambre);
+  const { packs12, packs6, precio, alitas } = calcular(personas);
 
   function cambiar(delta: number) {
     setPersonas(p => Math.min(20, Math.max(1, p + delta)));
@@ -30,7 +28,6 @@ export function WingCalculator() {
     <section className="bg-brand-dark border-y border-white/5 py-14 px-4">
       <div className="max-w-2xl mx-auto">
 
-        {/* Título */}
         <div className="text-center mb-10">
           <p className="text-brand-accent text-xs font-bold uppercase tracking-[0.35em] mb-2">
             Calculadora de alitas
@@ -41,7 +38,7 @@ export function WingCalculator() {
         </div>
 
         {/* Selector de personas */}
-        <div className="flex items-center justify-center gap-8 mb-8">
+        <div className="flex items-center justify-center gap-8 mb-10">
           <button
             onClick={() => cambiar(-1)}
             disabled={personas === 1}
@@ -68,21 +65,6 @@ export function WingCalculator() {
           </button>
         </div>
 
-        {/* Toggle hambre */}
-        <div className="flex justify-center mb-10">
-          <button
-            onClick={() => setHambre(h => !h)}
-            className={`flex items-center gap-2 px-5 py-2 rounded-full border text-sm font-semibold transition-all cursor-pointer ${
-              hambre
-                ? 'border-brand-secondary bg-brand-secondary/15 text-brand-secondary'
-                : 'border-white/15 text-white/40 hover:border-white/30 hover:text-white/60'
-            }`}
-          >
-            <span>🔥</span>
-            <span>Venimos con MUCHA hambre</span>
-          </button>
-        </div>
-
         {/* Recomendación */}
         <div className="rounded-sm border border-brand-primary/30 bg-brand-gray-900 p-6 sm:p-8">
           <p className="text-white/40 text-xs uppercase tracking-widest mb-5 text-center">
@@ -98,9 +80,7 @@ export function WingCalculator() {
                     {packs12} {packs12 === 1 ? 'orden' : 'órdenes'} de 12 Alitas
                   </span>
                 </div>
-                <span className="text-white/40 text-sm">
-                  L.{PRICE_12} c/u
-                </span>
+                <span className="text-white/40 text-sm">L.{PRICE_12} c/u</span>
               </div>
             )}
             {packs6 > 0 && (
@@ -111,9 +91,7 @@ export function WingCalculator() {
                     1 orden de 6 Alitas
                   </span>
                 </div>
-                <span className="text-white/40 text-sm">
-                  L.{PRICE_6}
-                </span>
+                <span className="text-white/40 text-sm">L.{PRICE_6}</span>
               </div>
             )}
           </div>
