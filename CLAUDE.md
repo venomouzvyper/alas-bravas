@@ -5,8 +5,8 @@
 Un hito no está completo hasta que su criterio de éxito está **verificado visualmente o funcionalmente**. No se avanza sin el tag de git correspondiente.
 
 ## Estado actual
-- **Hito activo:** Hito 4 — El Panel de Control (Admin)
-- **Última sesión:** Hito 3 completado y taggeado (`hito-3`)
+- **Hito activo:** Hito 5 — Los Acabados Finales
+- **Última sesión:** Hito 4 completado y taggeado (`hito-4`)
 
 ---
 
@@ -18,7 +18,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 | 1 | La Fachada y Estructura | ✅ Completo | `hito-1` |
 | 2 | Las Habitaciones | ✅ Completo | `hito-2` |
 | 3 | Las Tuberías (Base de datos) | ✅ Completo | `hito-3` |
-| 4 | El Panel de Control (Admin) | 🔲 Pendiente | — |
+| 4 | El Panel de Control (Admin) | ✅ Completo | `hito-4` |
 | 5 | Los Acabados Finales | 🔲 Pendiente | — |
 | 6 | La Mudanza (Launch) | 🔲 Pendiente | — |
 
@@ -119,6 +119,25 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 - Fotos individuales de platos → Cloudinary
 - Formulario de reservaciones con backend → Supabase
 - Datos del menú desde base de datos → reemplazar `lib/menu-data.ts`
+
+---
+
+## Hito 4 — El Panel de Control ✅
+
+**Criterio de éxito cumplido:** Login con Supabase Auth en `/admin`. Dashboard con stats en vivo. Reservaciones gestionables. Menú con toggles activos en producción.
+
+### Qué se construyó
+- `proxy.ts` — protección de rutas `/admin/*` con Web Crypto API (HMAC, sin dependencias externas)
+- `lib/admin-auth.ts` — firma y verificación de sesión, compatible con Edge Runtime
+- `app/admin/login/page.tsx` — formulario de login con Supabase Auth
+- `app/admin/page.tsx` — dashboard: reservas hoy / últimos 7 días / pendientes + últimas 8 reservas
+- `app/admin/reservaciones/page.tsx` + `ReservacionesTable.tsx` — tabla filtrable con botones confirmar/cancelar
+- `app/admin/menu/page.tsx` + `MenuToggleList.tsx` — toggles on/off por plato (refleja en el menú público)
+- `app/api/auth/login` + `logout` — gestión de cookie segura HTTP-only
+- `app/api/admin/reservaciones/[id]` + `menu/[id]` — PATCH protegido por cookie verificada
+
+### Variables de entorno nuevas
+- `ADMIN_SESSION_SECRET` — secreto HMAC de 32+ chars (en Vercel + .env.local)
 
 ---
 
