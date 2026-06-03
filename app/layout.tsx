@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas",
@@ -64,6 +65,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col antialiased">
         <GoogleAnalytics />
         {children}
+        <WhatsAppButton />
       </body>
     </html>
   );
