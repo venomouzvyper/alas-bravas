@@ -95,7 +95,7 @@ export function HeroReveal() {
               width={520}
               height={520}
               priority
-              className="w-[260px] sm:w-[360px] md:w-[460px] h-auto mix-blend-screen drop-shadow-[0_0_40px_rgba(232,93,4,0.5)]"
+              className="w-[260px] sm:w-[360px] md:w-[460px] h-auto drop-shadow-[0_0_60px_rgba(232,93,4,0.6)]"
             />
           </div>
 
