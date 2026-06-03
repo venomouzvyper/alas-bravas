@@ -16,21 +16,26 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
-      setError(data.error ?? 'Error al iniciar sesión');
+      if (!res.ok) {
+        setError(data.error ?? 'Email o contraseña incorrectos');
+        setLoading(false);
+        return;
+      }
+
+      router.push('/admin');
+    } catch {
+      setError('No se pudo conectar. Revisá tu conexión a internet.');
       setLoading(false);
-      return;
     }
-
-    router.push('/admin');
   }
 
   return (
