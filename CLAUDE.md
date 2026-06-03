@@ -88,8 +88,8 @@ Control:     Git local → GitHub (venomouzvyper/alas-bravas) → Vercel auto-de
 ## URLs del proyecto
 | Entorno | URL |
 |---------|-----|
-| Producción | https://alasbravashn.com (DNS en Hostinger — pendiente conectar a Vercel) |
-| Preview Vercel | https://alas-bravas.vercel.app (disponible tras primer deploy) |
+| Producción | https://www.alasbravashn.com ✅ |
+| Alias | https://alas-bravas.vercel.app ✅ |
 | Repositorio | https://github.com/venomouzvyper/alas-bravas |
 
 ## Variables de entorno necesarias (aún no configuradas)
