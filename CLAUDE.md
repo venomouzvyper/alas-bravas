@@ -80,9 +80,16 @@ Estilos:     Tailwind CSS 4 + Framer Motion
 Backend:     Next.js API Routes
 Base datos:  PostgreSQL vía Supabase (configurar en Hito 3)
 Imágenes:    Cloudinary (configurar en Hito 3)
-Deploy:      Vercel (configurar antes del Hito 1 o al final del Hito 0)
-Control:     Git local → GitHub → Vercel auto-deploy
+Deploy:      Vercel → alasbravashn.com
+Control:     Git local → GitHub (venomouzvyper/alas-bravas) → Vercel auto-deploy
 ```
+
+## URLs del proyecto
+| Entorno | URL |
+|---------|-----|
+| Producción | https://alasbravashn.com (pendiente conectar DNS) |
+| Preview Vercel | https://alas-bravas.vercel.app (disponible tras primer deploy) |
+| Repositorio | https://github.com/venomouzvyper/alas-bravas |
 
 ## Variables de entorno necesarias (aún no configuradas)
 ```env
