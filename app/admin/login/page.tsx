@@ -31,7 +31,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push('/admin');
+      window.location.href = '/admin';
     } catch {
       setError('No se pudo conectar. Revisá tu conexión a internet.');
       setLoading(false);
