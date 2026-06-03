@@ -5,8 +5,8 @@
 Un hito no está completo hasta que su criterio de éxito está **verificado visualmente o funcionalmente**. No se avanza sin el tag de git correspondiente.
 
 ## Estado actual
-- **Hito activo:** Hito 3 — Las Tuberías (Base de datos)
-- **Última sesión:** Hito 2 completado y taggeado (`hito-2`)
+- **Hito activo:** Hito 4 — El Panel de Control (Admin)
+- **Última sesión:** Hito 3 completado y taggeado (`hito-3`)
 
 ---
 
@@ -17,7 +17,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 | 0 | El Terreno | ✅ Completo | `hito-0` |
 | 1 | La Fachada y Estructura | ✅ Completo | `hito-1` |
 | 2 | Las Habitaciones | ✅ Completo | `hito-2` |
-| 3 | Las Tuberías (Base de datos) | 🔲 Pendiente | — |
+| 3 | Las Tuberías (Base de datos) | ✅ Completo | `hito-3` |
 | 4 | El Panel de Control (Admin) | 🔲 Pendiente | — |
 | 5 | Los Acabados Finales | 🔲 Pendiente | — |
 | 6 | La Mudanza (Launch) | 🔲 Pendiente | — |
@@ -119,6 +119,29 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 - Fotos individuales de platos → Cloudinary
 - Formulario de reservaciones con backend → Supabase
 - Datos del menú desde base de datos → reemplazar `lib/menu-data.ts`
+
+---
+
+## Hito 3 — Las Tuberías ✅
+
+**Criterio de éxito cumplido:** Menú cargando desde Supabase en producción. Reservaciones guardándose en DB. Verificado en `alasbravashn.com`.
+
+### Qué se construyó
+- `lib/supabase.ts` — clientes público y admin con fallback graceful si no hay env vars
+- `app/menu/page.tsx` — Server Component que fetcha `menu_items` desde Supabase
+- `app/reservaciones/page.tsx` + `components/sections/ReservacionForm.tsx` — formulario completo con validación y estado de éxito
+- `app/api/reservaciones/route.ts` — API route POST que guarda en Supabase con service role
+- `supabase/schema.sql` — schema completo con RLS + seed de los 12 items del menú real
+- Header RESERVAR linkea a `/reservaciones`
+
+### Base de datos Supabase
+- **Proyecto:** `dgacqokpfwrizgcivsbr` (us-east-1)
+- **Tablas:** `menu_items` (12 registros), `reservaciones`
+- **RLS:** `menu_items` → SELECT público · `reservaciones` → INSERT público, lectura solo service role
+
+### Variables de entorno configuradas
+- Vercel: Production + Preview + Development ✅
+- `.env.local`: configurado localmente ✅ (en `.gitignore`, nunca al repo)
 
 ---
 
