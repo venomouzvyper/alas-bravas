@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Inter } from "next/font/google";
+import { Bebas_Neue, Barlow } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
@@ -11,9 +11,10 @@ const bebasNeue = Bebas_Neue({
   weight: "400",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const barlow = Barlow({
+  variable: "--font-barlow",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 const BASE_URL = "https://www.alasbravashn.com";
@@ -61,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${bebasNeue.variable} ${inter.variable} h-full`}
+      className={`${bebasNeue.variable} ${barlow.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
         <GoogleAnalytics />
