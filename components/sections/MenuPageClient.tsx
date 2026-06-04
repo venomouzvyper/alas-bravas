@@ -162,7 +162,7 @@ export function MenuPageClient({ items, promoDia }: Props) {
         </motion.div>
 
         {/* CTA WhatsApp — cierra el loop */}
-        <div className="mt-12 mb-2">
+        <div className="mt-12">
           <a
             href={WA_PEDIDO}
             target="_blank"
@@ -173,26 +173,6 @@ export function MenuPageClient({ items, promoDia }: Props) {
             <WhatsAppIcon />
             Hacer pedido por WhatsApp
           </a>
-          <p className="text-center text-brand-cream/30 text-xs mt-3">
-            📍 La Cabaña, San Lorenzo · 🕐 1 PM – 11 PM · 🛵 Delivery por Mandaditos
-          </p>
-        </div>
-
-        {/* Info del restaurante */}
-        <div className="mt-10 grid grid-cols-3 gap-4 border-t border-brand-gray-800 pt-10">
-          {[
-            { icon: "📍", titulo: "Ubicación", detalle: "La Cabaña, San Lorenzo" },
-            { icon: "🕐", titulo: "Horario", detalle: "1 PM — 11 PM" },
-            { icon: "🛵", titulo: "Delivery", detalle: "Mandaditos" },
-          ].map(({ icon, titulo, detalle }) => (
-            <div key={titulo} className="text-center">
-              <span className="text-2xl block mb-1">{icon}</span>
-              <p className="font-display text-sm text-brand-accent tracking-widest uppercase">
-                {titulo}
-              </p>
-              <p className="text-brand-cream/60 text-xs mt-0.5">{detalle}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
