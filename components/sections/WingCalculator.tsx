@@ -24,12 +24,12 @@ function esPromoDia() {
   return d === 3 || d === 4;
 }
 
-function buildWaMsg(personas: number, packs12: number, packs6: number, precio: number) {
+function buildWaMsg(packs12: number, packs6: number, precio: number) {
   const lineas = [
-    `Hola 👋 Somos ${personas} ${personas === 1 ? 'persona' : 'personas'} y quisiéramos pedir:`,
-    ...(packs12 > 0 ? [`• ${packs12} ${packs12 === 1 ? 'orden' : 'órdenes'} de 12 Alitas (L.${PRICE_12} c/u)`] : []),
-    ...(packs6  > 0 ? [`• 1 orden de 6 Alitas (L.${PRICE_6})`] : []),
-    `\nTotal estimado: L.${precio} 🍗`,
+    `Hola 👋 Me gustaría pedir:`,
+    ...(packs12 > 0 ? [`• ${packs12} ${packs12 === 1 ? 'orden' : 'órdenes'} de 12 Alitas BB o Búfalo (L.${PRICE_12}${packs12 > 1 ? ' c/u' : ''})`] : []),
+    ...(packs6  > 0 ? [`• 1 orden de 6 Alitas BB o Búfalo (L.${PRICE_6})`] : []),
+    `\nTotal: L.${precio} 🍗`,
   ];
   return `https://wa.me/50432462305?text=${encodeURIComponent(lineas.join('\n'))}`;
 }
@@ -86,7 +86,7 @@ export function WingCalculator() {
   const alitasExtra = hintPromo ? 14 - alitas : 0;
   const ahorro      = hintPromo ? precio - PRICE_PROMO_14 : 0;
 
-  const waLink = buildWaMsg(personas, packs12, packs6, precio);
+  const waLink = buildWaMsg(packs12, packs6, precio);
 
   function cambiar(delta: number) {
     setPersonas(p => Math.min(20, Math.max(1, p + delta)));
@@ -97,9 +97,10 @@ export function WingCalculator() {
       className="relative overflow-hidden py-16 px-4"
       style={{ background: 'linear-gradient(180deg, #0D0602 0%, #180900 50%, #0D0602 100%)' }}
     >
-      {/* Emoji decorativo de fondo */}
+      {/* Emoji decorativo de fondo — capa GPU propia para que repaints del componente no lo muevan */}
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.06] text-[18rem] leading-none"
+        style={{ transform: 'translateZ(0)', willChange: 'transform' }}
         aria-hidden="true"
       >
         🍗
