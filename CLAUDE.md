@@ -201,7 +201,53 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ---
 
-## Stack técnico
+## Sesión Post-Launch — UX & Conversión ✅
+
+**Objetivo:** Convertir el sitio de "bonito" a "que vende". Menú optimizado para QR, header con identidad de marca, ticker fluido en iOS, constructor de pedidos completo.
+
+### UrgencyTicker — fix iOS Safari
+- **Problema:** CSS `animation-duration` mutada en JS reiniciaba la animación. iOS Safari pausa animaciones al hacer scroll.
+- **Fix:** Reescrito con `requestAnimationFrame` — posición fijada frame a frame, inmune a pausa del browser.
+- **Velocidad dinámica:** 90px/s móvil · 65px/s tablet · 45px/s desktop.
+- **Archivo:** `components/sections/UrgencyTicker.tsx`
+
+### Header — rediseño completo
+- Logo + "ALAS BRAVAS" en Boogaloo visible en todos los viewports.
+- Estado activo en nav desktop con underline en `brand-accent`.
+- Hamburger animado → X con CSS transforms.
+- Menú móvil como overlay full-screen: links en Boogaloo 5xl táctiles, CTA reservar, horario y ubicación al pie.
+- Borde inferior `brand-primary/30` para calidez de marca.
+- **Archivo:** `components/layout/Header.tsx`
+
+### Página de Menú — optimización para QR
+- **Hero eliminado** — se va directo a los platos al abrir el QR.
+- **Banner contextual del día** — detectado en servidor (zona horaria Honduras). Mié/Jue muestra promo de alitas, Viernes la promo de 2 platos.
+- **CATEGORIAS reordenadas:** Promos ⚡ primero, Ver todo al final. Default: "promos" en días de promo, "alitas" el resto.
+- **Grid 2 columnas en móvil** — mitad del scroll. Promos a ancho completo para jerarquía.
+- **Campo `destacado`** en `ItemMenu` — badge ⭐ Top en los ítems más pedidos.
+- **CTA WhatsApp** al final del grid — cierra el loop de conversión.
+- **Archivos:** `app/menu/page.tsx`, `components/sections/MenuPageClient.tsx`, `lib/menu-data.ts`
+
+### OrderBuilder — constructor de pedido completo
+Reemplaza al `WingCalculator`. El cliente:
+1. Elige tipo de orden: **Delivery** (vía Mandaditos) / **Para recoger** / **Comer aquí**
+2. Agrega cualquier combinación de platos del menú con +/−
+3. Elige salsa **BB o Búfalo** por cada orden de alitas (aparece animado al agregar)
+4. Llena datos contextualmente: nombre siempre, dirección+referencia solo si delivery, personas solo si dine-in, notas opcionales siempre
+5. El CTA se habilita solo cuando el pedido está completo — muestra el motivo de bloqueo progresivamente
+6. WhatsApp se abre con el pedido completo pre-armado incluyendo tipo de orden, ítems con sabores, total, dirección y notas
+
+**Lógica de disponibilidad por día:** Ítems con `dia` field aparecen deshabilitados si el día actual no corresponde (pupusas solo mié/jue, promos de viernes solo viernes).
+
+**Aviso de Mandaditos:** Aclara explícitamente que el costo del delivery lo cobra Mandaditos según distancia — no está incluido en el subtotal del pedido.
+
+**Detección de horario:** Si el restaurante está cerrado (antes de 1 PM o después de 11 PM), muestra aviso y cambia el CTA a "Pre-ordenar".
+
+- **Archivo:** `components/sections/OrderBuilder.tsx` (elimina `WingCalculator.tsx`)
+
+---
+
+
 
 ```
 Frontend:    Next.js 16 (App Router) + TypeScript
@@ -236,5 +282,7 @@ CLOUDINARY_API_SECRET=
 ## Convenciones del proyecto
 - **Idioma:** Todo el sitio en español. `lang="es"` en el HTML.
 - **Commits:** Un commit al completar cada tarea significativa. Tag al completar un hito.
-- **Sin delivery/carrito en v1:** El carrito y pagos online van en v2.
+- **OrderBuilder (no carrito formal):** El `OrderBuilder` arma pedidos y los envía por WhatsApp — no hay carrito persistente ni pagos en línea. Los pagos en línea van en v2.
 - **Mobile-first:** Todo componente nuevo se diseña primero en 390px.
+- **QR-first para el menú:** La página `/menu` es el destino principal de los códigos QR del restaurante. Decisiones de UX priorizan la experiencia de un cliente en el local con el teléfono en la mano.
+- **Persuasión sobre información:** Los componentes del menú deben vender, no solo mostrar datos. Anclaje de precio, urgencia temporal, prueba social y CTAs claros son requisitos, no opcionales.
