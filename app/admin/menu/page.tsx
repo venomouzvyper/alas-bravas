@@ -7,10 +7,10 @@ async function getMenuItems() {
 
   const { data } = await supabase
     .from('menu_items')
-    .select('id, nombre, categoria, precio, descripcion, emoji, spice, dia, orden, activo, image_url')
+    .select('*')
     .order('orden');
 
-  return data ?? [];
+  return (data ?? []).map(i => ({ ...i, image_url: i.image_url ?? null }));
 }
 
 export default async function MenuAdminPage() {

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       activo: body.activo ?? true,
       image_url: body.image_url ?? null,
     })
-    .select('id, nombre, categoria, precio, descripcion, emoji, spice, dia, orden, activo, image_url')
+    .select('*')
     .single();
 
   if (error) {

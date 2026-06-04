@@ -55,7 +55,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       image_url: body.image_url ?? null,
     })
     .eq('id', id)
-    .select('id, nombre, categoria, precio, descripcion, emoji, spice, dia, orden, activo, image_url')
+    .select('*')
     .single();
 
   if (error) return NextResponse.json({ error: 'Error al actualizar' }, { status: 500 });
