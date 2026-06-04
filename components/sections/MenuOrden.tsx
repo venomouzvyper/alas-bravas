@@ -500,22 +500,10 @@ export function MenuOrden({ items, promoDia }: Props) {
             className="fixed bottom-0 left-0 right-0 z-40 px-3"
             style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
             <button onClick={() => setDrawerOpen(true)}
-              className="relative w-full max-w-lg mx-auto rounded-2xl font-bold text-brand-cream shadow-2xl shadow-black/60 cursor-pointer transition-transform active:scale-[0.98] overflow-hidden block"
-              style={{ background: "#1A0400" }}>
-              {/* Glow central — mismos valores que el hero */}
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 85% 65% at 50% 50%, #E85D04 0%, #C1121F 38%, transparent 68%)", opacity: 0.38 }} />
-              {/* Glows flotantes animados */}
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 55% 80% at 22% 50%, rgba(193,18,31,0.22) 0%, transparent 70%)", animation: "glow-left 7s ease-in-out infinite" }} />
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 55% 80% at 78% 50%, rgba(232,93,4,0.22) 0%, transparent 70%)", animation: "glow-right 7s ease-in-out infinite" }} />
-              {/* Overlay oscuro para profundidad */}
-              <div className="absolute inset-0 bg-brand-dark/45 pointer-events-none" />
-              {/* Brasas mini */}
-              <EmberParticles mini />
-              {/* Ítems en pedido */}
-              <div className="relative z-10 px-5 pt-3 pb-2 border-b border-white/8">
+              className="relative w-full max-w-lg mx-auto rounded-2xl overflow-hidden cursor-pointer transition-transform active:scale-[0.98] block"
+              style={{ boxShadow: "0 8px 32px rgba(193,18,31,0.45)" }}>
+              {/* Zona 1 — ítems: panel oscuro, legible */}
+              <div className="px-5 pt-3 pb-3 bg-black/80">
                 {itemsEnOrden.slice(0, 3).map(({ item, ord }) => (
                   <div key={item.id} className="flex items-center justify-between gap-3 py-0.5">
                     <span className="text-white text-xs font-medium">{item.nombre}</span>
@@ -523,13 +511,17 @@ export function MenuOrden({ items, promoDia }: Props) {
                   </div>
                 ))}
                 {itemsEnOrden.length > 3 && (
-                  <p className="text-brand-cream/35 text-[10px] mt-1">+{itemsEnOrden.length - 3} más</p>
+                  <p className="text-brand-cream/40 text-[10px] mt-1">+{itemsEnOrden.length - 3} más</p>
                 )}
               </div>
-              {/* CTA */}
-              <div className="relative z-10 flex items-center justify-between px-5 py-4">
-                <span className="text-sm text-brand-cream/70">{itemCount} {itemCount === 1 ? "ítem" : "ítems"}</span>
-                <span className="font-display text-xl tracking-wider">VER PEDIDO · L.{total}</span>
+              {/* Zona 2 — CTA: fuego real, rojo a naranja */}
+              <div className="relative overflow-hidden"
+                style={{ background: "linear-gradient(to right, #C1121F 0%, #E85D04 100%)" }}>
+                <EmberParticles mini colors={["#FFD700", "#FFED4A", "#FFF176", "#FFB703"]} />
+                <div className="relative z-10 flex items-center justify-between px-5 py-4">
+                  <span className="text-white/80 text-sm font-medium">{itemCount} {itemCount === 1 ? "ítem" : "ítems"}</span>
+                  <span className="font-display text-xl tracking-wider text-white">VER PEDIDO · L.{total}</span>
+                </div>
               </div>
             </button>
           </motion.div>
