@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export interface MenuItem {
   id: string;
@@ -13,6 +13,7 @@ export interface MenuItem {
   dia: string | null;
   orden: number;
   activo: boolean;
+  image_url: string | null;
 }
 
 const CATEGORIAS = ['alitas', 'carnes', 'tajadas', 'pupusas', 'bebidas', 'promos'] as const;
@@ -30,7 +31,7 @@ type FormData = Omit<MenuItem, 'id'>;
 
 const EMPTY_FORM: FormData = {
   nombre: '', categoria: 'alitas', precio: 0, descripcion: '',
-  emoji: '🍗', spice: null, dia: '', orden: 99, activo: true,
+  emoji: '🍗', spice: null, dia: '', orden: 99, activo: true, image_url: null,
 };
 
 function formToPayload(f: FormData) {
@@ -53,6 +54,10 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
   const [deleteTarget, setDeleteTarget] = useState<MenuItem | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imgUploading, setImgUploading] = useState(false);
+  const [imgProgress, setImgProgress] = useState(0);
+  const [imgError, setImgError] = useState<string | null>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
 
   const byCategory = items.reduce<Record<string, MenuItem[]>>((acc, item) => {
     (acc[item.categoria] ??= []).push(item);
@@ -70,6 +75,7 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
       nombre: item.nombre, categoria: item.categoria, precio: item.precio,
       descripcion: item.descripcion ?? '', emoji: item.emoji,
       spice: item.spice, dia: item.dia ?? '', orden: item.orden, activo: item.activo,
+      image_url: item.image_url ?? null,
     });
     setError(null);
     setModal(item);
@@ -139,6 +145,49 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
     setForm(prev => ({ ...prev, [key]: value }));
   }
 
+  async function handleImageUpload(file: File) {
+    if (!file.type.startsWith('image/')) {
+      setImgError('Solo se permiten imágenes.');
+      return;
+    }
+    setImgUploading(true);
+    setImgError(null);
+    setImgProgress(10);
+
+    const sigRes = await fetch('/api/admin/menu/image-signature');
+    if (!sigRes.ok) {
+      setImgError('No se pudo obtener la firma.');
+      setImgUploading(false);
+      return;
+    }
+    const { signature, timestamp, folder, api_key, cloud_name } = await sigRes.json();
+    setImgProgress(25);
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('signature', signature);
+    fd.append('timestamp', String(timestamp));
+    fd.append('folder', folder);
+    fd.append('api_key', api_key);
+
+    const uploadRes = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+      { method: 'POST', body: fd }
+    );
+    setImgProgress(80);
+
+    if (!uploadRes.ok) {
+      setImgError('Error al subir la imagen.');
+      setImgUploading(false);
+      return;
+    }
+
+    const uploaded = await uploadRes.json();
+    field('image_url', uploaded.secure_url);
+    setImgProgress(100);
+    setImgUploading(false);
+  }
+
   return (
     <>
       {/* Encabezado con botón nuevo */}
@@ -174,7 +223,12 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
                     i < catItems.length - 1 ? 'border-b border-white/5' : ''
                   } ${!item.activo ? 'opacity-50' : ''}`}
                 >
-                  <span className="text-2xl shrink-0">{item.emoji}</span>
+                  <div className="w-10 h-10 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-brand-gray-800 border border-white/5">
+                    {item.image_url
+                      ? <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                      : <span className="text-xl">{item.emoji}</span>
+                    }
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-brand-cream font-medium truncate">{item.nombre}</p>
                     <p className="text-brand-accent text-sm">L.{item.precio}</p>
@@ -284,6 +338,50 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
                   onChange={e => field('descripcion', e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-brand-cream text-sm focus:outline-none focus:border-brand-primary resize-none"
                   placeholder="Descripción del plato…"
+                />
+              </div>
+
+              {/* Foto del plato */}
+              <div>
+                <label className="block text-white/60 text-xs mb-2">Foto del plato</label>
+                <div className="flex items-start gap-3">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden border border-white/10 shrink-0 bg-white/5 flex items-center justify-center">
+                    {form.image_url
+                      ? <img src={form.image_url} alt="" className="w-full h-full object-cover" />
+                      : <span className="text-3xl">{form.emoji || '🍗'}</span>
+                    }
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => imgInputRef.current?.click()}
+                      disabled={imgUploading}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {imgUploading ? `Subiendo… ${imgProgress}%` : form.image_url ? 'Cambiar foto' : '+ Subir foto'}
+                    </button>
+                    {form.image_url && (
+                      <button
+                        type="button"
+                        onClick={() => { field('image_url', null); setImgError(null); }}
+                        className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-white/30 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      >
+                        Quitar foto
+                      </button>
+                    )}
+                    {imgError && <p className="text-red-400 text-xs">{imgError}</p>}
+                  </div>
+                </div>
+                <input
+                  ref={imgInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={e => {
+                    const f = e.target.files?.[0];
+                    if (f) handleImageUpload(f);
+                    e.target.value = '';
+                  }}
                 />
               </div>
 

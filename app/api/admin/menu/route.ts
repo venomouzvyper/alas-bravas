@@ -29,8 +29,9 @@ export async function POST(req: NextRequest) {
       dia: body.dia || null,
       orden: body.orden ? Number(body.orden) : 99,
       activo: body.activo ?? true,
+      image_url: body.image_url ?? null,
     })
-    .select('id, nombre, categoria, precio, descripcion, emoji, spice, dia, orden, activo')
+    .select('id, nombre, categoria, precio, descripcion, emoji, spice, dia, orden, activo, image_url')
     .single();
 
   if (error) {

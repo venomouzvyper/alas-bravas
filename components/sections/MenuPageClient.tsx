@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { CATEGORIAS, type ItemMenu, type Categoria } from "@/lib/menu-data";
 
@@ -54,16 +55,28 @@ export function MenuPageClient({ items }: Props) {
                 transition={{ duration: 0.25 }}
                 className="rounded-sm overflow-hidden border border-white/5 hover:border-brand-primary/40 transition-colors"
               >
-                {/* Imagen placeholder */}
-                <div
-                  className="h-40 flex items-center justify-center text-5xl relative"
-                  style={{
-                    background: `linear-gradient(135deg, ${item.gradientFrom} 0%, ${item.gradientTo} 100%)`,
-                  }}
-                >
-                  <span>{item.emoji}</span>
+                {/* Imagen */}
+                <div className="h-40 relative overflow-hidden">
+                  {item.image_url ? (
+                    <Image
+                      src={item.image_url}
+                      alt={item.nombre}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="h-full flex items-center justify-center text-5xl"
+                      style={{
+                        background: `linear-gradient(135deg, ${item.gradientFrom ?? '#2A1400'} 0%, ${item.gradientTo ?? '#C1121F'} 100%)`,
+                      }}
+                    >
+                      <span>{item.emoji}</span>
+                    </div>
+                  )}
                   {item.dia && (
-                    <span className="absolute top-3 right-3 bg-brand-accent text-brand-dark text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                    <span className="absolute top-3 right-3 bg-brand-accent text-brand-dark text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm z-10">
                       {item.dia}
                     </span>
                   )}

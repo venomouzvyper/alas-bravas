@@ -10,8 +10,9 @@ export interface ItemMenu {
   dia?: string;
   spice?: 'mild' | 'medium' | 'hot';
   emoji: string;
-  gradientFrom: string;
-  gradientTo: string;
+  gradientFrom?: string;
+  gradientTo?: string;
+  image_url?: string | null;
 }
 
 export const MENU_ITEMS: ItemMenu[] = [
