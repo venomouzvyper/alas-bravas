@@ -35,11 +35,20 @@ body {
 ::-webkit-scrollbar-track { background: #1A0A00; }
 ::-webkit-scrollbar-thumb { background: #C1121F; border-radius: 3px; }
 
-/* Ticker animado */
+/* Ticker — CSS puro, sin JS: mutar animationDuration reinicia la animación */
 @keyframes marquee {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to   { transform: translateX(-50%); }
 }
+
+.ticker-track {
+  will-change: transform;
+  animation: marquee 18s linear infinite;
+}
+
+/* Más contenido visible → velocidad más lenta para dar tiempo de lectura */
+@media (min-width: 640px)  { .ticker-track { animation-duration: 24s; } }
+@media (min-width: 1024px) { .ticker-track { animation-duration: 30s; } }
 
 /* Hero animations — CSS puro para LCP óptimo */
 @keyframes hero-slide-up {

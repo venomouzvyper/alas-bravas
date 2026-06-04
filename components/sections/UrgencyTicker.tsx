@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-
 const ITEMS = [
   "🍗 6 ALITAS DESDE L.180",
   "🔥 MIÉ Y JUE: 14 ALITAS POR L.300",
@@ -11,42 +7,15 @@ const ITEMS = [
   "🛵 PIDE POR MANDADITOS",
 ];
 
-function getSpeed(): number {
-  const w = window.innerWidth;
-  if (w < 640) return 150;
-  if (w < 1024) return 100;
-  return 80;
-}
-
 export function UrgencyTicker() {
-  const trackRef = useRef<HTMLDivElement>(null);
   const doubled = [...ITEMS, ...ITEMS];
-
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-
-    function updateSpeed() {
-      if (!el) return;
-      const halfWidth = el.scrollWidth / 2;
-      el.style.animationDuration = `${halfWidth / getSpeed()}s`;
-    }
-
-    updateSpeed();
-    window.addEventListener('resize', updateSpeed);
-    return () => window.removeEventListener('resize', updateSpeed);
-  }, []);
 
   return (
     <div
       className="relative overflow-hidden bg-brand-primary py-3 border-y border-brand-secondary/20"
       aria-hidden="true"
     >
-      <div
-        ref={trackRef}
-        className="flex whitespace-nowrap"
-        style={{ animation: "marquee 24s linear infinite" }}
-      >
+      <div className="ticker-track flex whitespace-nowrap">
         {doubled.map((item, i) => (
           <span
             key={i}
