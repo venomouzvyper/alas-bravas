@@ -11,6 +11,7 @@ export interface ItemMenu {
   spice?: 'mild' | 'medium' | 'hot';
   destacado?: boolean;
   valorTag?: string;
+  precioRegular?: number;
   emoji: string;
   gradientFrom?: string;
   gradientTo?: string;
@@ -124,6 +125,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     dia: 'Viernes',
     valorTag: 'AHORRÁS L.20',
+    precioRegular: 320,
     emoji: '🎉',
     gradientFrom: '#1A0400',
     gradientTo: '#8B0000',
@@ -137,6 +139,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     dia: 'Viernes',
     valorTag: 'AHORRÁS L.20',
+    precioRegular: 320,
     emoji: '🎉',
     gradientFrom: '#1A0600',
     gradientTo: '#7A1F00',
