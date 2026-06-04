@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { CATEGORIAS, type ItemMenu, type Categoria } from "@/lib/menu-data";
@@ -121,6 +121,47 @@ const WaIcon = () => (
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
   </svg>
 );
+
+// ── Wizard helpers ────────────────────────────────────────────────────
+const ChevronLeft = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+    <path d="M15 18l-6-6 6-6" />
+  </svg>
+);
+
+const stepVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 48 : -48, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
+};
+
+function FloatingInput({ id, label, type = "text", value, onChange, required = false }: {
+  id: string; label: string; type?: string; value: string;
+  onChange: (v: string) => void; required?: boolean;
+}) {
+  const [focused, setFocused] = useState(false);
+  const isUp = focused || value.length > 0;
+  return (
+    <div className="relative">
+      <label htmlFor={id}
+        className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 select-none ${
+          isUp
+            ? "top-2 text-[10px] font-bold uppercase tracking-wider text-brand-accent"
+            : "top-1/2 -translate-y-1/2 text-sm text-brand-cream/40"
+        }`}>
+        {label}{required && " *"}
+      </label>
+      <input id={id} type={type} value={value}
+        onChange={e => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={`w-full rounded-xl px-4 pt-6 pb-3 text-brand-cream text-sm border transition-all duration-200 outline-none bg-white/8 ${
+          focused ? "border-brand-primary" : "border-white/15"
+        }`}
+      />
+    </div>
+  );
+}
 
 // ── MenuCard ──────────────────────────────────────────────────────────
 function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor }: {
@@ -355,6 +396,8 @@ export function MenuOrden({ items, promoDia }: Props) {
   const [direccion, setDireccion]   = useState("");
   const [referencia, setReferencia] = useState("");
   const [notas, setNotas]           = useState("");
+  const [paso, setPaso]             = useState<1 | 2 | 3>(1);
+  const [direction, setDirection]   = useState(1);
 
   const abierto     = estaAbierto();
   const bannerData  = useMemo(() => getBannerData(), []);
@@ -394,6 +437,12 @@ export function MenuOrden({ items, promoDia }: Props) {
       }),
     [orden, items]
   );
+  const pasoCompleto = useMemo(() => {
+    if (paso !== 2) return true;
+    if (nombre.trim().length < 2) return false;
+    if (tipo === "delivery" && (telefono.trim().length < 7 || direccion.trim().length < 5)) return false;
+    return true;
+  }, [paso, nombre, tipo, telefono, direccion]);
 
   function cambiarCantidad(id: string, delta: number) {
     setOrden(prev => {
@@ -419,6 +468,16 @@ export function MenuOrden({ items, promoDia }: Props) {
   }
   function quickAdd(item: ItemMenu) {
     setOrden(prev => ({ ...prev, [item.id]: { ...prev[item.id], cantidad: (prev[item.id]?.cantidad ?? 0) + 1 } }));
+  }
+
+  const tipoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  function openDrawer() { setPaso(1); setDirection(1); setDrawerOpen(true); }
+  function avanzar()    { setDirection(1); setPaso(p => (Math.min(3, p + 1)) as 1 | 2 | 3); }
+  function retroceder() { setDirection(-1); setPaso(p => (Math.max(1, p - 1)) as 1 | 2 | 3); }
+  function elegirTipo(t: TipoOrden) {
+    if (tipoTimerRef.current) clearTimeout(tipoTimerRef.current);
+    setTipo(t);
+    tipoTimerRef.current = setTimeout(() => avanzar(), 250);
   }
 
   const puedeEnviar =
@@ -499,7 +558,7 @@ export function MenuOrden({ items, promoDia }: Props) {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-40 px-3"
             style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
-            <button onClick={() => setDrawerOpen(true)}
+            <button onClick={openDrawer}
               className="relative w-full max-w-lg mx-auto rounded-2xl overflow-hidden cursor-pointer transition-transform active:scale-[0.98] block"
               style={{ boxShadow: "0 8px 32px rgba(193,18,31,0.45)" }}>
               {/* Zona 1 — ítems: panel oscuro, legible */}
@@ -528,7 +587,7 @@ export function MenuOrden({ items, promoDia }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Drawer de checkout */}
+      {/* Drawer de checkout — wizard */}
       <AnimatePresence>
         {drawerOpen && (
           <>
@@ -539,156 +598,192 @@ export function MenuOrden({ items, promoDia }: Props) {
               className="fixed bottom-0 left-0 right-0 z-50 bg-brand-dark rounded-t-3xl max-h-[88vh] flex flex-col"
               style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
 
-              {/* Header */}
-              <div className="relative flex items-center justify-between px-5 pt-5 pb-4 border-b border-white/5 shrink-0">
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-white/15" />
-                <div>
-                  <p className="font-display text-xl text-brand-cream tracking-wider">TU PEDIDO</p>
-                  <p className="text-brand-cream/40 text-xs mt-0.5">{itemCount} {itemCount === 1 ? "ítem" : "ítems"} · L.{total}</p>
-                </div>
-                <button onClick={() => setDrawerOpen(false)}
-                  className="w-8 h-8 rounded-full bg-brand-gray-800 text-brand-cream/60 hover:text-brand-cream flex items-center justify-center transition-colors cursor-pointer text-lg leading-none"
-                  aria-label="Cerrar">×</button>
-              </div>
-
-              {/* Contenido */}
-              <div className="overflow-y-auto flex-1 px-5 py-5 space-y-5">
-                {!abierto && (
-                  <div className="bg-brand-gray-900 border border-brand-accent/30 rounded-xl px-4 py-3 text-center">
-                    <p className="text-brand-accent font-bold text-sm">🕐 Abrimos a la 1:00 PM</p>
-                    <p className="text-brand-cream/45 text-xs mt-1">Podés armar tu pedido ahora y enviarlo cuando abramos</p>
-                  </div>
-                )}
-
-                {/* Resumen con controles */}
-                <div className="bg-brand-gray-900 rounded-xl px-4 py-3 space-y-3">
-                  {Object.entries(orden).map(([id, ord]) => {
-                    if (!ord.cantidad) return null;
-                    const item = items.find(i => i.id === id);
-                    if (!item) return null;
-                    return (
-                      <div key={id}>
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl shrink-0">{item.emoji}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-brand-cream/80 text-sm font-semibold truncate">{item.nombre}</p>
-                            {necesitaSabor(item) && ord.sabor && (
-                              <p className="text-brand-accent text-xs">Salsa: {ord.sabor}</p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <button onClick={() => cambiarCantidad(id, -1)} className="w-7 h-7 rounded-full bg-brand-gray-800 hover:bg-brand-gray-700 text-brand-cream text-sm font-bold active:scale-90 cursor-pointer flex items-center justify-center">−</button>
-                            <span className="w-5 text-center text-sm font-bold text-brand-cream tabular-nums">{ord.cantidad}</span>
-                            <button onClick={() => cambiarCantidad(id, 1)} disabled={ord.cantidad >= 20} className="w-7 h-7 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold disabled:opacity-25 active:scale-90 cursor-pointer flex items-center justify-center">+</button>
-                          </div>
-                          <p className="text-brand-accent font-bold text-sm shrink-0 w-14 text-right">L.{item.precio * ord.cantidad}</p>
-                        </div>
-                        {/* Selector de salsa inline — aparece si falta elegir */}
-                        {necesitaSabor(item) && !ord.sabor && (
-                          <div className="flex items-center gap-2 mt-2 pl-10">
-                            <span className="text-brand-primary text-[10px] font-bold animate-pulse shrink-0">Salsa:</span>
-                            {(["BB", "Búfalo"] as Sabor[]).map(s => (
-                              <button key={s} onClick={() => cambiarSabor(id, s)}
-                                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-gray-800 hover:bg-brand-primary text-brand-cream/70 hover:text-brand-cream transition-all cursor-pointer border border-brand-primary/40">
-                                {s}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                  <div className="border-t border-white/5 pt-3 flex justify-between items-center">
-                    <p className="text-brand-cream/35 text-sm">Subtotal</p>
-                    <p className="font-display text-3xl text-brand-accent tracking-wider">L.{total}</p>
-                  </div>
-                </div>
-
-                {/* Upsell contextual */}
-                {upsell && (
-                  <button onClick={() => quickAdd(upsell.item)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-dashed border-white/12 hover:border-brand-accent/40 transition-all cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{upsell.item.emoji}</span>
-                      <div className="text-left">
-                        <p className="text-brand-cream/65 text-xs font-semibold group-hover:text-brand-cream transition-colors">{upsell.label}</p>
-                        <p className="text-brand-cream/30 text-[10px]">{upsell.item.nombre}</p>
-                      </div>
-                    </div>
-                    <span className="text-brand-accent font-bold text-sm">+ L.{upsell.item.precio}</span>
-                  </button>
-                )}
-
-                {/* Tipo de orden */}
-                <div>
-                  <p className="text-brand-cream/40 text-[10px] uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-brand-primary text-brand-cream text-[9px] flex items-center justify-center font-black shrink-0">1</span>
-                    ¿Cómo lo querés?
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {TIPOS.map(t => (
-                      <button key={t.id} onClick={() => setTipo(t.id)}
-                        className={["flex flex-col items-center justify-center gap-1 py-3 px-1.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-center",
-                          tipo === t.id ? "border-brand-primary bg-brand-primary/15 text-brand-cream" : "border-white/8 bg-brand-gray-900 text-brand-cream/50 hover:border-white/20 hover:text-brand-cream",
-                        ].join(" ")}>
-                        <span className="text-xl">{t.emoji}</span>
-                        <p className="font-bold text-[11px] leading-tight">{t.label}</p>
-                        <p className={`text-[9px] leading-tight ${tipo === t.id ? "text-brand-cream/50" : "text-brand-cream/25"}`}>{t.sub}</p>
+              {/* Header fijo */}
+              <div className="relative shrink-0 px-5 pt-5 pb-3 border-b border-white/5">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-white/20" />
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="w-8 h-8 shrink-0 flex items-center justify-center">
+                    {paso > 1 && (
+                      <button onClick={retroceder} className="w-8 h-8 flex items-center justify-center text-brand-cream/50 hover:text-brand-cream cursor-pointer transition-colors">
+                        <ChevronLeft />
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Datos */}
-                <div>
-                  <p className="text-brand-cream/40 text-[10px] uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-brand-primary text-brand-cream text-[9px] flex items-center justify-center font-black shrink-0">2</span>
-                    Tus datos
-                  </p>
-                  <div className="space-y-3">
-                    <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Tu nombre *"
-                      className="w-full bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3 text-brand-cream text-sm placeholder:text-brand-cream/20 focus:outline-none focus:border-brand-primary/60 transition-colors" />
-                    {tipo === "delivery" && (
-                      <>
-                        <input type="tel" value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Teléfono de contacto *"
-                          className="w-full bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3 text-brand-cream text-sm placeholder:text-brand-cream/20 focus:outline-none focus:border-brand-primary/60 transition-colors" />
-                        <input type="text" value={direccion} onChange={e => setDireccion(e.target.value)} placeholder="Dirección *"
-                          className="w-full bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3 text-brand-cream text-sm placeholder:text-brand-cream/20 focus:outline-none focus:border-brand-primary/60 transition-colors" />
-                        <input type="text" value={referencia} onChange={e => setReferencia(e.target.value)} placeholder="Punto de referencia (opcional)"
-                          className="w-full bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3 text-brand-cream text-sm placeholder:text-brand-cream/20 focus:outline-none focus:border-brand-primary/60 transition-colors" />
-                        <div className="bg-brand-gray-900 border border-brand-accent/20 rounded-xl px-4 py-3">
-                          <p className="text-brand-accent text-xs font-bold">🛵 Sobre el costo del delivery</p>
-                          <p className="text-brand-cream/40 text-xs mt-1 leading-relaxed">Mandaditos cobra su tarifa según distancia — no está incluido en el subtotal.</p>
-                        </div>
-                      </>
                     )}
-                    <textarea value={notas} onChange={e => setNotas(e.target.value)} placeholder="Notas: sin encurtido, salsa aparte... (opcional)" rows={2}
-                      className="w-full bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3 text-brand-cream text-sm placeholder:text-brand-cream/20 focus:outline-none focus:border-brand-primary/60 transition-colors resize-none" />
                   </div>
+                  <div className="flex-1 text-center">
+                    <AnimatePresence mode="wait">
+                      <motion.p key={paso} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.15 }}
+                        className="font-display text-lg text-brand-cream tracking-wider">
+                        {paso === 1 ? "¿CÓMO LO QUERÉS?" : paso === 2 ? "TUS DATOS" : "CONFIRMÁ TU PEDIDO"}
+                      </motion.p>
+                    </AnimatePresence>
+                    <p className="text-brand-cream/35 text-xs mt-0.5">{itemCount} {itemCount === 1 ? "ítem" : "ítems"} · L.{total}</p>
+                  </div>
+                  <button onClick={() => setDrawerOpen(false)}
+                    className="w-8 h-8 rounded-full bg-brand-gray-800 text-brand-cream/60 hover:text-brand-cream flex items-center justify-center shrink-0 cursor-pointer text-lg leading-none">×</button>
                 </div>
               </div>
 
-              {/* CTA + aviso de pago */}
-              <div className="px-5 pt-3 pb-4 border-t border-white/5 shrink-0 space-y-3">
-                <div className="flex items-center gap-3 bg-brand-gray-900 border border-brand-accent/25 rounded-xl px-4 py-3">
-                  <span className="text-xl shrink-0">💵</span>
-                  <div>
-                    <p className="text-brand-cream text-sm font-bold">Pagás al recibir tu pedido</p>
-                    <p className="text-brand-cream/45 text-xs mt-0.5">Sin cobro online · sin tarjeta necesaria</p>
-                  </div>
-                </div>
-                {puedeEnviar ? (
-                  <a href={waLink} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-white transition-all hover:opacity-90 active:scale-95"
-                    style={{ background: "#25D366" }}>
-                    <WaIcon />{abierto ? `Pedir ahora · L.${total}` : `Pre-ordenar · L.${total}`}
-                  </a>
-                ) : (
-                  <button disabled className="w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-brand-cream/30 bg-brand-gray-800 cursor-not-allowed">
-                    {motivoInhabilitar ?? "Completá tu pedido"}
-                  </button>
-                )}
+              {/* Progress dots */}
+              <div className="shrink-0 flex items-center justify-center gap-2.5 py-3">
+                {([1, 2, 3] as const).map(n => (
+                  <div key={n} className={`rounded-full transition-all duration-300 ${
+                    n === paso ? "w-5 h-1.5 bg-brand-accent" :
+                    n < paso  ? "w-2 h-2 bg-brand-primary" :
+                                "w-2 h-2 bg-white/15"
+                  }`} />
+                ))}
               </div>
+
+              {/* Aviso horario */}
+              {!abierto && (
+                <div className="shrink-0 mx-5 mb-1 flex items-center gap-2 bg-brand-gray-900 border border-brand-accent/25 rounded-xl px-4 py-2.5">
+                  <span className="text-brand-accent text-sm shrink-0">🕐</span>
+                  <p className="text-brand-accent/80 text-xs font-medium">Abrimos a la 1:00 PM — podés pre-ordenar ahora</p>
+                </div>
+              )}
+
+              {/* Contenido animado por paso */}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <AnimatePresence custom={direction} mode="wait">
+                  <motion.div key={paso} custom={direction} variants={stepVariants}
+                    initial="enter" animate="center" exit="exit"
+                    transition={{ duration: 0.22, ease: "easeInOut" }}
+                    className="h-full overflow-y-auto">
+
+                    {/* ── Paso 1: ¿Cómo lo querés? ── */}
+                    {paso === 1 && (
+                      <div className="px-5 py-6">
+                        <p className="text-brand-cream/35 text-center text-sm mb-6">Elegí cómo recibir tu pedido</p>
+                        <div className="grid grid-cols-2 gap-4">
+                          {TIPOS.map(t => (
+                            <button key={t.id} onClick={() => elegirTipo(t.id)}
+                              className={`flex flex-col items-center justify-center gap-3 py-8 rounded-2xl border-2 transition-all duration-200 cursor-pointer active:scale-[0.97] ${
+                                tipo === t.id
+                                  ? "border-brand-primary bg-brand-primary/20 shadow-lg shadow-brand-primary/20"
+                                  : "border-white/10 bg-white/5"
+                              }`}>
+                              <span className="text-5xl">{t.emoji}</span>
+                              <div className="text-center">
+                                <p className="font-display text-xl text-brand-cream tracking-wider">{t.label.toUpperCase()}</p>
+                                <p className="text-brand-cream/40 text-xs mt-0.5">{t.sub}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── Paso 2: Tus datos ── */}
+                    {paso === 2 && (
+                      <div className="px-5 py-6 space-y-4">
+                        <FloatingInput id="nombre" label="Tu nombre" value={nombre} onChange={setNombre} required />
+                        {tipo === "delivery" && (
+                          <>
+                            <FloatingInput id="telefono" label="Teléfono de contacto" type="tel" value={telefono} onChange={setTelefono} required />
+                            <FloatingInput id="direccion" label="Dirección" value={direccion} onChange={setDireccion} required />
+                            <FloatingInput id="referencia" label="Punto de referencia (opcional)" value={referencia} onChange={setReferencia} />
+                            <div className="flex items-start gap-2.5 bg-white/4 rounded-xl px-4 py-3">
+                              <span className="text-base shrink-0 mt-0.5">🛵</span>
+                              <p className="text-brand-cream/40 text-xs leading-relaxed">El costo de delivery lo cobra Mandaditos según distancia — no está incluido en el total.</p>
+                            </div>
+                          </>
+                        )}
+                        <FloatingInput id="notas" label="Notas opcionales (sin encurtido, salsa aparte...)" value={notas} onChange={setNotas} />
+                        <button onClick={avanzar} disabled={!pasoCompleto}
+                          className={`w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase transition-all ${
+                            pasoCompleto
+                              ? "bg-brand-primary text-white cursor-pointer hover:bg-red-700 active:scale-[0.98]"
+                              : "bg-brand-gray-800 text-brand-cream/30 cursor-not-allowed"
+                          }`}>
+                          {pasoCompleto ? "Confirmar pedido →" :
+                            nombre.trim().length < 2 ? "Escribí tu nombre" :
+                            tipo === "delivery" && telefono.trim().length < 7 ? "Escribí tu teléfono" :
+                            tipo === "delivery" && direccion.trim().length < 5 ? "Escribí tu dirección" :
+                            "Completá los datos"}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* ── Paso 3: Confirmá ── */}
+                    {paso === 3 && (
+                      <div className="px-5 py-6 space-y-4">
+                        {/* Resumen de ítems */}
+                        <div className="bg-white/4 rounded-2xl px-4 py-4 space-y-3">
+                          {itemsEnOrden.map(({ item, ord }) => (
+                            <div key={item.id}>
+                              <div className="flex items-center gap-3 justify-between">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className="text-xl shrink-0">{item.emoji}</span>
+                                  <div className="min-w-0">
+                                    <p className="text-brand-cream/85 text-sm font-medium leading-tight">{item.nombre}</p>
+                                    {necesitaSabor(item) && ord.sabor && (
+                                      <p className="text-brand-accent text-xs mt-0.5">Salsa: {ord.sabor}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="shrink-0 text-right">
+                                  <p className="text-brand-cream/40 text-xs">×{ord.cantidad}</p>
+                                  <p className="text-brand-accent text-sm font-bold">L.{item.precio * ord.cantidad}</p>
+                                </div>
+                              </div>
+                              {necesitaSabor(item) && !ord.sabor && (
+                                <div className="flex items-center gap-2 mt-2 pl-9">
+                                  <span className="text-brand-primary text-[10px] font-bold animate-pulse shrink-0">Salsa:</span>
+                                  {(["BB", "Búfalo"] as Sabor[]).map(s => (
+                                    <button key={s} onClick={() => cambiarSabor(item.id, s)}
+                                      className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-gray-800 hover:bg-brand-primary text-brand-cream/70 hover:text-brand-cream transition-all cursor-pointer border border-brand-primary/40">
+                                      {s}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                          <div className="border-t border-white/8 pt-3 flex justify-between items-center">
+                            <p className="text-brand-cream/35 text-sm">Total</p>
+                            <p className="font-display text-4xl text-brand-accent tracking-wider">L.{total}</p>
+                          </div>
+                        </div>
+
+                        {/* Tipo + nombre confirmación */}
+                        <div className="flex items-center gap-3 bg-white/4 rounded-xl px-4 py-3">
+                          <span className="text-2xl shrink-0">{TIPOS.find(t => t.id === tipo)?.emoji}</span>
+                          <div>
+                            <p className="text-brand-cream/40 text-[10px] uppercase tracking-widest font-bold">{TIPOS.find(t => t.id === tipo)?.label}</p>
+                            <p className="text-brand-cream/85 text-sm font-medium">{nombre}</p>
+                            {tipo === "delivery" && direccion && <p className="text-brand-cream/45 text-xs mt-0.5">{direccion}</p>}
+                          </div>
+                        </div>
+
+                        {/* Aviso de pago */}
+                        <div className="flex items-center gap-3 bg-brand-gray-900 border border-brand-accent/25 rounded-xl px-4 py-3">
+                          <span className="text-xl shrink-0">💵</span>
+                          <div>
+                            <p className="text-brand-cream text-sm font-bold">Pagás al recibir tu pedido</p>
+                            <p className="text-brand-cream/45 text-xs mt-0.5">Sin cobro online · sin tarjeta necesaria</p>
+                          </div>
+                        </div>
+
+                        {/* CTA */}
+                        {puedeEnviar ? (
+                          <a href={waLink} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-white transition-all hover:opacity-90 active:scale-95"
+                            style={{ background: "#25D366", boxShadow: "0 0 24px rgba(37,211,102,0.35)" }}>
+                            <WaIcon />{abierto ? `Pedir ahora · L.${total}` : `Pre-ordenar · L.${total}`}
+                          </a>
+                        ) : (
+                          <button disabled className="w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-brand-cream/30 bg-brand-gray-800 cursor-not-allowed">
+                            {motivoInhabilitar ?? "Completá tu pedido"}
+                          </button>
+                        )}
+                        <p className="text-brand-cream/20 text-xs text-center pb-2">← Cerrá para editar el pedido</p>
+                      </div>
+                    )}
+
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
             </motion.div>
           </>
         )}
