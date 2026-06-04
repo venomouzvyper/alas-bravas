@@ -63,7 +63,7 @@ export function HeroReveal() {
             <button
               onClick={handleChoice}
               style={phase === 'burning' ? { animation: 'btn-ignite 0.42s ease forwards' } : {}}
-              className="px-10 py-4 rounded-full border border-brand-cream/25 text-brand-cream font-display text-2xl tracking-widest hover:border-brand-cream/60 transition-colors cursor-pointer"
+              className="px-10 py-4 rounded-full border-2 border-brand-cream/55 bg-white/5 text-brand-cream font-display text-2xl tracking-widest hover:border-brand-accent hover:bg-white/10 transition-colors cursor-pointer"
             >
               A LAS BUENAS
             </button>
@@ -112,7 +112,7 @@ export function HeroReveal() {
             </Link>
             <Link
               href="/reservaciones"
-              className="inline-flex items-center justify-center px-10 py-4 rounded-full border border-brand-cream/30 hover:border-brand-accent text-brand-cream hover:text-brand-accent font-display text-xl tracking-widest uppercase transition-colors duration-200"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-full border-2 border-brand-cream/55 bg-white/5 hover:border-brand-accent hover:bg-white/10 text-brand-cream hover:text-brand-accent font-display text-xl tracking-widest uppercase transition-colors duration-200"
             >
               Reservar
             </Link>

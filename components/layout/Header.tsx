@@ -22,18 +22,15 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" aria-label="Alas Bravas — Inicio">
             <Image
               src="/logo-hero.png"
               alt="Alas Bravas"
-              width={52}
-              height={52}
+              width={56}
+              height={56}
               className="object-contain"
               priority
             />
-            <span className="font-display text-xl text-brand-cream tracking-wider leading-none">
-              ALAS<span className="text-brand-primary"> BRAVAS</span>
-            </span>
           </Link>
 
           {/* Navegación desktop */}

@@ -14,7 +14,7 @@ const variantClasses: Record<Variant, string> = {
   secondary:
     "bg-brand-secondary hover:bg-orange-600 text-brand-dark font-bold tracking-wide uppercase",
   ghost:
-    "border border-brand-cream/40 hover:border-brand-accent text-brand-cream hover:text-brand-accent",
+    "border-2 border-brand-cream/60 bg-white/5 hover:border-brand-accent hover:bg-white/10 text-brand-cream hover:text-brand-accent",
 };
 
 const sizeClasses: Record<Size, string> = {
