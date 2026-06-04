@@ -216,20 +216,22 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
       </div>
 
       {/* Contenido — overflow-hidden para no romper la altura fija */}
-      <div className={`bg-brand-gray-900 flex flex-col flex-1 overflow-hidden ${esPromo ? "p-4" : "p-3"}`}>
-        <h3 className={`font-display text-brand-cream tracking-wide leading-tight mb-1 line-clamp-1 ${esPromo ? "text-xl" : "text-sm sm:text-base"}`}>
-          {item.nombre.toUpperCase()}
-        </h3>
-        <p className={`text-brand-cream/50 leading-snug line-clamp-2 mb-1 ${esPromo ? "text-sm" : "text-[11px] sm:text-xs"}`}>
-          {item.descripcion}
-        </p>
-        {!!item.acompanamientos?.length && (
-          <p className={`text-brand-cream/25 leading-tight line-clamp-1 mb-2 ${esPromo ? "text-xs" : "text-[10px]"}`}>
-            Con: {item.acompanamientos.join(" · ")}
+      <div className={`bg-brand-gray-900 flex flex-col flex-1 overflow-hidden justify-between ${esPromo ? "p-4" : "p-3"}`}>
+        <div>
+          <h3 className={`font-display text-brand-cream tracking-wide leading-tight mb-1 line-clamp-1 ${esPromo ? "text-xl" : "text-base sm:text-lg"}`}>
+            {item.nombre.toUpperCase()}
+          </h3>
+          <p className={`text-brand-cream/50 leading-snug line-clamp-2 mb-1 ${esPromo ? "text-sm" : "text-xs sm:text-sm"}`}>
+            {item.descripcion}
           </p>
-        )}
-        {/* Precio + stepper — siempre al pie del contenido */}
-        <div className="flex items-center justify-between mt-auto gap-2">
+          {!!item.acompanamientos?.length && (
+            <p className={`text-brand-cream/30 leading-tight line-clamp-1 ${esPromo ? "text-xs" : "text-[11px] sm:text-xs"}`}>
+              Con: {item.acompanamientos.join(" · ")}
+            </p>
+          )}
+        </div>
+        {/* Precio + stepper */}
+        <div className="flex items-center justify-between gap-2">
           <p className={`font-display text-brand-accent tracking-wider leading-none ${esPromo ? "text-3xl" : "text-2xl"}`}>
             L.{item.precio}
           </p>
@@ -242,8 +244,12 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
                   <button onClick={() => onCambiar(1)} aria-label="Aumentar" className="w-7 h-7 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center">+</button>
                 </>
               ) : (
-                <button onClick={e => { e.stopPropagation(); onCambiar(1); }} aria-label={`Agregar ${item.nombre}`}
-                  className="w-9 h-9 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-xl font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center shadow-lg shadow-brand-primary/40">+</button>
+                <div className="relative">
+                  <span className="absolute inset-0 rounded-full bg-brand-primary/40 animate-ping pointer-events-none" />
+                  <button onClick={e => { e.stopPropagation(); onCambiar(1); }} aria-label={`Agregar ${item.nombre}`}
+                    className="relative w-9 h-9 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-xl font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center"
+                    style={{ boxShadow: "0 0 10px 2px rgba(193,18,31,0.55), 0 0 22px 4px rgba(193,18,31,0.25)" }}>+</button>
+                </div>
               )}
             </div>
           )}
@@ -504,11 +510,34 @@ export function MenuOrden({ items, promoDia }: Props) {
   return (
     <section className="bg-brand-dark pb-8">
 
-      {/* Banner contextual del día */}
+      {/* Banner contextual del día — ticket */}
       {bannerData && (
-        <div className={`py-3 px-4 text-center ${bannerData.tipo === "hoy" ? "bg-brand-primary" : "bg-brand-secondary"}`}>
-          <p className="text-brand-cream font-bold text-sm uppercase tracking-wider leading-tight">{bannerData.titulo}</p>
-          <p className="text-brand-cream/75 text-xs mt-1">{bannerData.sub}</p>
+        <div className="relative">
+          {/* Muescas laterales — ilusión de boleto perforado */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full z-10" style={{ background: "#0D0602" }} />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-6 h-6 rounded-full z-10" style={{ background: "#0D0602" }} />
+          {/* Cuerpo del ticket */}
+          <div
+            className="relative overflow-hidden py-3.5 px-10 sm:px-16 text-center"
+            style={{
+              background: "#FFF8F0",
+              borderTop: "1.5px dashed rgba(193,18,31,0.35)",
+              borderBottom: "1.5px dashed rgba(193,18,31,0.35)",
+            }}
+          >
+            {/* Llamas en los bordes */}
+            <div className="absolute left-0 top-0 bottom-0 w-20 pointer-events-none" style={{ background: "linear-gradient(to right, rgba(193,18,31,0.13), transparent)" }} />
+            <div className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none" style={{ background: "linear-gradient(to left, rgba(232,93,4,0.13), transparent)" }} />
+            <p
+              className="relative z-10 font-display tracking-widest leading-tight text-sm sm:text-base"
+              style={{ color: bannerData.tipo === "hoy" ? "#C1121F" : "#E85D04" }}
+            >
+              {bannerData.titulo}
+            </p>
+            <p className="relative z-10 text-xs mt-0.5" style={{ color: "rgba(13,6,2,0.55)" }}>
+              {bannerData.sub}
+            </p>
+          </div>
         </div>
       )}
 
