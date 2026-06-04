@@ -155,9 +155,13 @@ function FloatingInput({ id, label, type = "text", value, onChange, required = f
         onChange={e => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className={`w-full rounded-xl px-4 pt-6 pb-3 text-brand-cream text-sm border transition-all duration-200 outline-none bg-white/8 ${
-          focused ? "border-brand-primary" : "border-white/15"
+        className={`w-full rounded-xl px-4 pt-6 pb-3 text-brand-cream text-sm border transition-all duration-200 outline-none ${
+          focused ? "border-brand-primary" : "border-brand-primary/25"
         }`}
+        style={{
+          background: "#1A0600",
+          ...(focused ? { boxShadow: "0 0 0 3px rgba(193,18,31,0.22)" } : {})
+        }}
       />
     </div>
   );
@@ -595,11 +599,11 @@ export function MenuOrden({ items, promoDia }: Props) {
               className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
             <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-brand-dark rounded-t-3xl max-h-[88vh] flex flex-col"
-              style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl max-h-[88vh] flex flex-col"
+              style={{ background: "radial-gradient(ellipse 100% 30% at 50% 0%, rgba(193,18,31,0.18) 0%, transparent 65%), linear-gradient(180deg, #1A0400 0%, #0D0602 55%)", paddingBottom: "env(safe-area-inset-bottom)" }}>
 
               {/* Header fijo */}
-              <div className="relative shrink-0 px-5 pt-5 pb-3 border-b border-white/5">
+              <div className="relative shrink-0 px-5 pt-5 pb-3 border-b border-brand-primary/15">
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-white/20" />
                 <div className="flex items-center gap-3 mt-1">
                   <div className="w-8 h-8 shrink-0 flex items-center justify-center">
@@ -626,11 +630,13 @@ export function MenuOrden({ items, promoDia }: Props) {
               {/* Progress dots */}
               <div className="shrink-0 flex items-center justify-center gap-2.5 py-3">
                 {([1, 2, 3] as const).map(n => (
-                  <div key={n} className={`rounded-full transition-all duration-300 ${
-                    n === paso ? "w-5 h-1.5 bg-brand-accent" :
-                    n < paso  ? "w-2 h-2 bg-brand-primary" :
-                                "w-2 h-2 bg-white/15"
-                  }`} />
+                  <div key={n}
+                    className={`rounded-full transition-all duration-300 ${
+                      n === paso ? "w-5 h-1.5 bg-brand-accent" :
+                      n < paso  ? "w-2 h-2 bg-brand-primary" :
+                                  "w-2 h-2 bg-white/15"
+                    }`}
+                    style={n === paso ? { boxShadow: "0 0 10px rgba(255,183,3,0.7)" } : {}} />
                 ))}
               </div>
 
@@ -657,11 +663,15 @@ export function MenuOrden({ items, promoDia }: Props) {
                         <div className="grid grid-cols-2 gap-4">
                           {TIPOS.map(t => (
                             <button key={t.id} onClick={() => elegirTipo(t.id)}
-                              className={`flex flex-col items-center justify-center gap-3 py-8 rounded-2xl border-2 transition-all duration-200 cursor-pointer active:scale-[0.97] ${
-                                tipo === t.id
-                                  ? "border-brand-primary bg-brand-primary/20 shadow-lg shadow-brand-primary/20"
-                                  : "border-white/10 bg-white/5"
-                              }`}>
+                              className="flex flex-col items-center justify-center gap-3 py-8 rounded-2xl border-2 transition-all duration-200 cursor-pointer active:scale-[0.97]"
+                              style={tipo === t.id ? {
+                                background: "linear-gradient(135deg, #C1121F 0%, #E85D04 100%)",
+                                borderColor: "transparent",
+                                boxShadow: "0 0 30px rgba(232,93,4,0.40)"
+                              } : {
+                                background: "linear-gradient(135deg, rgba(193,18,31,0.12) 0%, rgba(232,93,4,0.07) 100%)",
+                                borderColor: "rgba(193,18,31,0.25)"
+                              }}>
                               <span className="text-5xl">{t.emoji}</span>
                               <div className="text-center">
                                 <p className="font-display text-xl text-brand-cream tracking-wider">{t.label.toUpperCase()}</p>
@@ -692,9 +702,12 @@ export function MenuOrden({ items, promoDia }: Props) {
                         <button onClick={avanzar} disabled={!pasoCompleto}
                           className={`w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase transition-all ${
                             pasoCompleto
-                              ? "bg-brand-primary text-white cursor-pointer hover:bg-red-700 active:scale-[0.98]"
-                              : "bg-brand-gray-800 text-brand-cream/30 cursor-not-allowed"
-                          }`}>
+                              ? "text-white cursor-pointer active:scale-[0.98]"
+                              : "text-brand-cream/30 cursor-not-allowed"
+                          }`}
+                          style={pasoCompleto
+                            ? { background: "linear-gradient(to right, #C1121F 0%, #E85D04 100%)" }
+                            : { background: "rgba(255,255,255,0.05)" }}>
                           {pasoCompleto ? "Confirmar pedido →" :
                             nombre.trim().length < 2 ? "Escribí tu nombre" :
                             tipo === "delivery" && telefono.trim().length < 7 ? "Escribí tu teléfono" :
@@ -708,7 +721,7 @@ export function MenuOrden({ items, promoDia }: Props) {
                     {paso === 3 && (
                       <div className="px-5 py-6 space-y-4">
                         {/* Resumen de ítems */}
-                        <div className="bg-white/4 rounded-2xl px-4 py-4 space-y-3">
+                        <div className="rounded-2xl px-4 py-4 space-y-3 border border-brand-primary/20" style={{ background: "#1A0400" }}>
                           {itemsEnOrden.map(({ item, ord }) => (
                             <div key={item.id}>
                               <div className="flex items-center gap-3 justify-between">
@@ -746,7 +759,7 @@ export function MenuOrden({ items, promoDia }: Props) {
                         </div>
 
                         {/* Tipo + nombre confirmación */}
-                        <div className="flex items-center gap-3 bg-white/4 rounded-xl px-4 py-3">
+                        <div className="flex items-center gap-3 rounded-xl px-4 py-3 border border-white/8" style={{ background: "#1A0400" }}>
                           <span className="text-2xl shrink-0">{TIPOS.find(t => t.id === tipo)?.emoji}</span>
                           <div>
                             <p className="text-brand-cream/40 text-[10px] uppercase tracking-widest font-bold">{TIPOS.find(t => t.id === tipo)?.label}</p>
