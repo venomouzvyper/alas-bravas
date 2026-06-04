@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Barlow, Rubik_Dirt } from "next/font/google";
+import { Boogaloo, Barlow } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { RestaurantJsonLd } from "@/components/layout/RestaurantJsonLd";
 
-const bebasNeue = Bebas_Neue({
-  variable: "--font-bebas",
+const boogaloo = Boogaloo({
+  variable: "--font-boogaloo",
   subsets: ["latin"],
   weight: "400",
 });
@@ -15,12 +15,6 @@ const barlow = Barlow({
   variable: "--font-barlow",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-});
-
-const rubikDirt = Rubik_Dirt({
-  variable: "--font-rubik-dirt",
-  subsets: ["latin"],
-  weight: "400",
 });
 
 const BASE_URL = "https://www.alasbravashn.com";
@@ -68,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${bebasNeue.variable} ${barlow.variable} ${rubikDirt.variable} h-full`}
+      className={`${boogaloo.variable} ${barlow.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
         <GoogleAnalytics />

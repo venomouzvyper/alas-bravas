@@ -120,7 +120,7 @@ export function GaleriaAdmin({ initial }: { initial: GalleryPhoto[] }) {
     <>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-bebas text-3xl text-brand-cream tracking-wider">Galería</h1>
+          <h1 className="font-display text-3xl text-brand-cream tracking-wider">Galería</h1>
           <p className="text-white/40 text-sm mt-0.5">
             Las fotos subidas aquí aparecen en la galería pública del sitio
           </p>

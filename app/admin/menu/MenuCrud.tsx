@@ -144,7 +144,7 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
       {/* Encabezado con botón nuevo */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-bebas text-3xl text-brand-cream tracking-wider">Menú</h1>
+          <h1 className="font-display text-3xl text-brand-cream tracking-wider">Menú</h1>
           <p className="text-white/40 text-sm mt-0.5">
             Gestiona los platos que aparecen en el menú público
           </p>
@@ -221,7 +221,7 @@ export function MenuCrud({ initial }: { initial: MenuItem[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
           <div className="bg-[#1A0A00] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-white/10">
-              <h2 className="font-bebas text-xl text-brand-cream tracking-wide">
+              <h2 className="font-display text-xl text-brand-cream tracking-wide">
                 {modal === 'crear' ? 'Nuevo plato' : 'Editar plato'}
               </h2>
               <button

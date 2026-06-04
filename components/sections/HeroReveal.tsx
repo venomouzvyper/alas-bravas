@@ -63,14 +63,14 @@ export function HeroReveal() {
             <button
               onClick={handleChoice}
               style={phase === 'burning' ? { animation: 'btn-ignite 0.42s ease forwards' } : {}}
-              className="px-10 py-4 border border-brand-cream/25 text-brand-cream font-display text-2xl tracking-widest hover:border-brand-cream/60 transition-colors cursor-pointer"
+              className="px-10 py-4 rounded-full border border-brand-cream/25 text-brand-cream font-display text-2xl tracking-widest hover:border-brand-cream/60 transition-colors cursor-pointer"
             >
               A LAS BUENAS
             </button>
             <button
               onClick={handleChoice}
               style={phase === 'burning' ? { animation: 'btn-ignite 0.42s ease 0.07s forwards' } : {}}
-              className="px-10 py-4 bg-brand-primary text-brand-cream font-display text-2xl tracking-widest hover:bg-red-700 transition-colors cursor-pointer"
+              className="px-10 py-4 rounded-full bg-brand-primary text-brand-cream font-display text-2xl tracking-widest hover:bg-red-700 transition-colors cursor-pointer"
             >
               A LAS MALAS
             </button>
@@ -106,13 +106,13 @@ export function HeroReveal() {
           >
             <Link
               href="/menu"
-              className="inline-flex items-center justify-center px-10 py-4 bg-brand-primary hover:bg-red-700 text-brand-cream font-display text-xl tracking-widest uppercase transition-colors duration-200"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream font-display text-xl tracking-widest uppercase transition-colors duration-200"
             >
               Ver el Menú
             </Link>
             <Link
               href="/reservaciones"
-              className="inline-flex items-center justify-center px-10 py-4 border border-brand-cream/30 hover:border-brand-accent text-brand-cream hover:text-brand-accent font-display text-xl tracking-widest uppercase transition-colors duration-200"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-full border border-brand-cream/30 hover:border-brand-accent text-brand-cream hover:text-brand-accent font-display text-xl tracking-widest uppercase transition-colors duration-200"
             >
               Reservar
             </Link>

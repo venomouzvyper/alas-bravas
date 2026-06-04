@@ -135,9 +135,9 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 - `components/layout/Footer.tsx` — link directo a Google Maps
 - OG image actualizada a la foto del restaurante de noche
 
-### Pendiente post-launch
-- Crear propiedad GA4 y agregar `NEXT_PUBLIC_GA_ID` en Vercel
-- Post de lanzamiento en Instagram `@alasbravas1709`
+### Post-launch completado
+- Google Analytics GA4 configurado y activo ✅
+- Post de lanzamiento en Instagram `@alasbravas1709` — pendiente
 
 ---
 

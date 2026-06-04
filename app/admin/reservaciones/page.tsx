@@ -20,7 +20,7 @@ export default async function ReservacionesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-bebas text-3xl text-brand-cream tracking-wider">Reservaciones</h1>
+        <h1 className="font-display text-3xl text-brand-cream tracking-wider">Reservaciones</h1>
         <p className="text-white/40 text-sm mt-0.5">Confirma o cancela las reservas recibidas</p>
       </div>
 

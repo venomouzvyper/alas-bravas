@@ -1,17 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SpiceBadge } from "@/components/ui/Badge";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-
-type SpiceLevel = "mild" | "medium" | "hot" | "inferno";
 
 interface Plato {
   id: number;
   nombre: string;
   descripcion: string;
   precio: string;
-  spice: SpiceLevel;
   gradientFrom: string;
   gradientTo: string;
   emoji: string;
@@ -23,7 +20,6 @@ const PLATOS: Plato[] = [
     nombre: "6 Alitas BB o Búfalo",
     descripcion: "Crujientes y jugosas. Elige entre BBQ o salsa Búfalo.",
     precio: "L. 180",
-    spice: "medium",
     gradientFrom: "#2A1400",
     gradientTo: "#E85D04",
     emoji: "🍗",
@@ -33,7 +29,6 @@ const PLATOS: Plato[] = [
     nombre: "12 Alitas BB o Búfalo",
     descripcion: "La porción grande para compartir. BB o Búfalo.",
     precio: "L. 320",
-    spice: "medium",
     gradientFrom: "#1A0A00",
     gradientTo: "#C1121F",
     emoji: "🍗",
@@ -43,7 +38,6 @@ const PLATOS: Plato[] = [
     nombre: "Carne de Cerdo con Chorizo",
     descripcion: "Carne asada + chorizo. Con tajadas, frijoles y encurtido.",
     precio: "L. 160",
-    spice: "mild",
     gradientFrom: "#1A0800",
     gradientTo: "#8B3A0F",
     emoji: "🥩",
@@ -53,7 +47,6 @@ const PLATOS: Plato[] = [
     nombre: "Chuleta Asada con Chorizo",
     descripcion: "Chuleta a la parrilla + chorizo. Con tajadas y frijoles.",
     precio: "L. 160",
-    spice: "mild",
     gradientFrom: "#200A00",
     gradientTo: "#7A2B00",
     emoji: "🍖",
@@ -63,7 +56,6 @@ const PLATOS: Plato[] = [
     nombre: "Tajadas Preparadas",
     descripcion: "Tajadas fritas con carne molida, ensalada y encurtido.",
     precio: "L. 90",
-    spice: "mild",
     gradientFrom: "#1A1400",
     gradientTo: "#856404",
     emoji: "🍌",
@@ -73,7 +65,6 @@ const PLATOS: Plato[] = [
     nombre: "Promo Mié/Jue: 14 Alitas",
     descripcion: "14 alitas BB o Búfalo con papas, kétchup y aderezo.",
     precio: "L. 300",
-    spice: "medium",
     gradientFrom: "#200800",
     gradientTo: "#C1121F",
     emoji: "🔥",
@@ -135,11 +126,10 @@ export function MenuPreview() {
 
               {/* Info */}
               <div className="p-5 bg-brand-gray-900">
-                <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="mb-2">
                   <h3 className="font-display text-[1.4rem] text-brand-cream tracking-wide leading-tight">
                     {plato.nombre.toUpperCase()}
                   </h3>
-                  <SpiceBadge level={plato.spice} />
                 </div>
                 <p className="text-brand-cream/55 text-sm leading-relaxed mb-4">
                   {plato.descripcion}
@@ -159,7 +149,9 @@ export function MenuPreview() {
           transition={{ duration: 0.5, delay: 0.25 }}
           className="text-center mt-12"
         >
-          <Button size="lg" variant="primary">Ver Menú Completo</Button>
+          <Link href="/menu">
+            <Button size="lg" variant="primary">Ver Menú Completo</Button>
+          </Link>
         </motion.div>
       </div>
     </section>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CATEGORIAS, type ItemMenu, type Categoria } from "@/lib/menu-data";
-import { SpiceBadge } from "@/components/ui/Badge";
 
 interface Props {
   items: ItemMenu[];
@@ -27,7 +26,7 @@ export function MenuPageClient({ items }: Props) {
               <button
                 key={cat.id}
                 onClick={() => setCategoriaActiva(cat.id)}
-                className={`flex-shrink-0 px-4 py-2 rounded-sm text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                   categoriaActiva === cat.id
                     ? "bg-brand-primary text-brand-cream"
                     : "bg-brand-gray-800 text-brand-cream/60 hover:text-brand-cream hover:bg-brand-gray-700"
@@ -72,11 +71,10 @@ export function MenuPageClient({ items }: Props) {
 
                 {/* Info */}
                 <div className="p-5 bg-brand-gray-900">
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                  <div className="mb-1.5">
                     <h3 className="font-display text-xl text-brand-cream tracking-wide leading-tight">
                       {item.nombre.toUpperCase()}
                     </h3>
-                    {item.spice && <SpiceBadge level={item.spice} />}
                   </div>
                   <p className="text-brand-cream/55 text-sm leading-relaxed mb-3">
                     {item.descripcion}

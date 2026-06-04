@@ -45,7 +45,7 @@ export default function LoginPage() {
           <Image src="/logo.jpg" alt="Alas Bravas" width={80} height={80} className="rounded-full" />
         </div>
 
-        <h1 className="font-bebas text-4xl text-center text-brand-cream tracking-wider mb-1">
+        <h1 className="font-display text-4xl text-center text-brand-cream tracking-wider mb-1">
           Alas Bravas
         </h1>
         <p className="text-center text-white/40 text-sm mb-8 tracking-widest uppercase">

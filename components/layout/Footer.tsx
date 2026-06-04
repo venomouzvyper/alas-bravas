@@ -8,7 +8,7 @@ export function Footer() {
 
           {/* Marca */}
           <div>
-            <p className="font-bebas text-3xl text-brand-cream tracking-wider mb-3">
+            <p className="font-display text-3xl text-brand-cream tracking-wider mb-3">
               ALAS<span className="text-brand-primary"> BRAVAS</span>
             </p>
             <p className="text-brand-cream/50 text-sm leading-relaxed">

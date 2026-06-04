@@ -24,11 +24,11 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/logo.jpg"
+              src="/logo-hero.png"
               alt="Alas Bravas"
-              width={48}
-              height={48}
-              className="object-contain rounded-sm"
+              width={52}
+              height={52}
+              className="object-contain"
               priority
             />
             <span className="font-display text-xl text-brand-cream tracking-wider leading-none">

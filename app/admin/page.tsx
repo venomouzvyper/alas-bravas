@@ -46,7 +46,7 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-bebas text-3xl text-brand-cream tracking-wider">Dashboard</h1>
+        <h1 className="font-display text-3xl text-brand-cream tracking-wider">Dashboard</h1>
         <p className="text-white/40 text-sm mt-0.5">Vista general del restaurante</p>
       </div>
 
@@ -123,7 +123,7 @@ export default async function AdminDashboard() {
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="rounded-xl border border-white/10 p-4">
-      <p className={`font-bebas text-4xl ${color}`}>{value}</p>
+      <p className={`font-display text-4xl ${color}`}>{value}</p>
       <p className="text-white/50 text-sm mt-0.5">{label}</p>
     </div>
   );

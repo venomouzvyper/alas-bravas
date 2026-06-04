@@ -24,7 +24,7 @@ export function AdminNav() {
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-1">
-            <span className="text-brand-accent font-bebas text-xl tracking-wider">Alas Bravas</span>
+            <span className="text-brand-accent font-display text-xl tracking-wider">Alas Bravas</span>
             <span className="text-xs text-white/40 ml-2 uppercase tracking-widest">Admin</span>
           </div>
 
