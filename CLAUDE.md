@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Menú interactivo — auditoría UX y conversión completa (ver sección abajo)
+- **Última sesión:** Checkout wizard — rediseño completo del flujo de pedido (ver sección abajo)
 
 ---
 
@@ -323,6 +323,64 @@ Reemplaza al `WingCalculator`. El cliente:
 **Detección de horario:** Si el restaurante está cerrado (antes de 1 PM o después de 11 PM), muestra aviso y cambia el CTA a "Pre-ordenar".
 
 - **Archivo:** `components/sections/OrderBuilder.tsx` (elimina `WingCalculator.tsx`)
+
+---
+
+## Sesión Checkout Wizard — Rediseño del flujo de pedido ✅
+
+**Objetivo:** Convertir el checkout de formulario estático a experiencia conversacional de 3 pasos con identidad visual de fuego.
+
+### Cambios en la barra flotante (`MenuOrden.tsx`)
+
+**Dos zonas separadas:**
+- **Zona superior (ítems):** panel `bg-black/80` con nombres completos de ítems + cantidad `×N` en dorado. El cliente sabe exactamente qué tiene sin abrir nada.
+- **Zona inferior (CTA):** gradiente `#C1121F → #E85D04`, brasas doradas (`EmberParticles mini` con `colors=['#FFD700'...]`) flotando sobre fuego real. Aura roja exterior `boxShadow: 0 8px 32px rgba(193,18,31,0.45)`.
+
+**Gradientes corregidos:** opacidades igualadas al hero (0.38 / 0.22) + overlay `bg-brand-dark/45` para profundidad.
+
+### Checkout wizard (3 pasos)
+
+Reemplaza el drawer de formulario único. Estructura fija:
+- **Header:** título animado por paso + back button `←` + `itemCount · L.total` siempre visible
+- **Progress dots:** `● ● ○` — dot activo: pill dorado `w-5 h-1.5` con `boxShadow` glow; completados: `brand-primary`; próximos: `white/15`
+- **Contenido animado:** slide horizontal (Framer Motion `custom={direction}` + `mode="wait"`)
+
+**Paso 1 — ¿Cómo lo querés?**
+- "Comer aquí" eliminado del drawer (unificado con `/reservaciones`)
+- Dos cards grandes con emoji `text-5xl` + label `font-display`
+- Sin seleccionar: gradiente tenue `rgba(193,18,31,0.12) → rgba(232,93,4,0.07)` + borde `rgba(193,18,31,0.25)`
+- Seleccionada: `linear-gradient(135deg, #C1121F, #E85D04)` completo + `boxShadow: 0 0 30px rgba(232,93,4,0.40)`
+- Auto-avanza 250ms tras selección (con `useRef` para evitar double-advance)
+
+**Paso 2 — Tus datos**
+- `FloatingInput`: label flota arriba al escribir (animación CSS), fondo `#1A0600`, borde `brand-primary/25` → `brand-primary` en focus + `boxShadow: 0 0 0 3px rgba(193,18,31,0.22)`
+- Para recoger: solo nombre + notas. Delivery: + teléfono + dirección + referencia
+- Botón "Confirmar pedido →": gradiente `#C1121F → #E85D04` cuando habilitado, muestra motivo de bloqueo cuando no
+
+**Paso 3 — Confirmá tu pedido**
+- Resumen de ítems con emoji + nombre + salsa + precio por ítem
+- Salsa inline si falta elegir (igual que antes)
+- Card tipo+nombre de confirmación
+- Aviso de pago visible (card con borde dorado)
+- CTA verde WhatsApp con `boxShadow: 0 0 24px rgba(37,211,102,0.35)`
+
+### Cambios visuales del drawer
+
+- Fondo: `radial-gradient(ellipse 100% 30% at 50% 0%, rgba(193,18,31,0.18)...) + linear-gradient(#1A0400 → #0D0602)` — continuidad cálida con el menú
+- Separador header: `border-brand-primary/15` (cálido)
+- Cards paso 3: `background: #1A0400` + `border border-brand-primary/20`
+
+### EmberParticles — prop `colors`
+
+`components/ui/EmberParticles.tsx` acepta `colors?: string[]` para paleta custom. La barra flotante usa `["#FFD700", "#FFED4A", "#FFF176", "#FFB703"]` — brasas doradas sobre fuego rojo-naranja.
+
+### Deploy
+
+Vercel CLI instalada en `~/.local/bin/vercel`. El auto-deploy de GitHub→Vercel dejó de funcionar; usar `~/.local/bin/vercel --prod` para deployar manualmente desde el repo.
+
+### "Comer aquí" → Reservaciones
+
+La opción "Comer aquí" fue eliminada del drawer de checkout. El flujo de reservación vive en `/reservaciones` (ya existente con campos: nombre, teléfono, fecha, hora, personas, notas). Pendiente: mejoras visuales a esa página para consistencia con la marca.
 
 ---
 
