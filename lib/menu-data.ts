@@ -176,7 +176,7 @@ export const MENU_ITEMS: ItemMenu[] = [
 ];
 
 export const CATEGORIAS: { id: Categoria | 'todos'; label: string }[] = [
-  { id: 'promos', label: 'Promos ⚡' },
+  { id: 'promos', label: 'Promos' },
   { id: 'alitas', label: 'Alitas' },
   { id: 'carnes', label: 'Carnes' },
   { id: 'tajadas', label: 'Tajadas' },

@@ -13,7 +13,15 @@ type Sabor = "BB" | "Búfalo";
 interface ItemOrden { cantidad: number; sabor?: Sabor; }
 
 type BannerTipo = "hoy" | "prox";
-interface BannerData { titulo: string; sub: string; tipo: BannerTipo; }
+interface BannerData {
+  titulo: string; sub: string; tipo: BannerTipo;
+  ofertas?: { label: string; precio: string }[];
+}
+
+const CAT_ICONS: Record<string, string> = {
+  promos: '⚡', alitas: '🍗', carnes: '🥩',
+  tajadas: '🍌', pupusas: '🫓', bebidas: '🥤', todos: '◈',
+};
 
 // ── Constantes ────────────────────────────────────────────────────────
 const TIPOS = [
@@ -80,9 +88,22 @@ function getUpsell(orden: Record<string, ItemOrden>, items: ItemMenu[]): { item:
   return null;
 }
 function getBannerData(): BannerData | null {
-  const d = getHondurasTime().getDay(); // 0=Dom 1=Lun 2=Mar 3=Mié 4=Jue 5=Vie 6=Sáb
-  if (d === 3 || d === 4) return { titulo: "🔥 HOY: 14 ALITAS POR L.300 · 7 ALITAS POR L.180", sub: "Promos activas hoy — solo miércoles y jueves", tipo: "hoy" };
-  if (d === 5) return { titulo: "🎉 VIERNES: 2 PLATOS POR L.300", sub: "Solo hoy · Aprovecha antes de que se acabe", tipo: "hoy" };
+  const d = getHondurasTime().getDay();
+  if (d === 3 || d === 4) return {
+    titulo: "🔥 HOY ES DÍA DE ALITAS",
+    sub: "Solo miércoles y jueves · ¡Aprovechá!",
+    tipo: "hoy",
+    ofertas: [
+      { label: "14 ALITAS BB O BÚFALO", precio: "L.300" },
+      { label: "7 ALITAS BB O BÚFALO",  precio: "L.180" },
+    ],
+  };
+  if (d === 5) return {
+    titulo: "🎉 PROMO VIERNES",
+    sub: "Solo hoy · Aprovechá antes de que se acabe",
+    tipo: "hoy",
+    ofertas: [{ label: "2 PLATOS A ELEGIR", precio: "L.300" }],
+  };
   if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié y jue · Trae a tus amigos", tipo: "prox" };
   return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos todos los mié, jue y viernes", tipo: "prox" };
 }
@@ -244,12 +265,8 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
                   <button onClick={() => onCambiar(1)} aria-label="Aumentar" className="w-7 h-7 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center">+</button>
                 </>
               ) : (
-                <div className="relative">
-                  <span className="absolute inset-0 rounded-full bg-brand-primary/40 animate-ping pointer-events-none" />
-                  <button onClick={e => { e.stopPropagation(); onCambiar(1); }} aria-label={`Agregar ${item.nombre}`}
-                    className="relative w-9 h-9 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-xl font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center"
-                    style={{ boxShadow: "0 0 10px 2px rgba(193,18,31,0.55), 0 0 22px 4px rgba(193,18,31,0.25)" }}>+</button>
-                </div>
+                <button onClick={e => { e.stopPropagation(); onCambiar(1); }} aria-label={`Agregar ${item.nombre}`}
+                  className="btn-breathe w-9 h-9 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-xl font-bold transition-colors active:scale-90 cursor-pointer flex items-center justify-center">+</button>
               )}
             </div>
           )}
@@ -508,52 +525,91 @@ export function MenuOrden({ items, promoDia }: Props) {
     : "#";
 
   return (
-    <section className="bg-brand-dark pb-8">
+    <section className="pb-8" style={{ background: "#160500" }}>
 
-      {/* Banner contextual del día — ticket */}
+      {/* Banner contextual del día — ticket físico */}
       {bannerData && (
         <div className="relative">
-          {/* Muescas laterales — ilusión de boleto perforado */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full z-10" style={{ background: "#0D0602" }} />
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-6 h-6 rounded-full z-10" style={{ background: "#0D0602" }} />
+          {/* Muescas — ilusión de boleto perforado */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full z-10" style={{ background: "#160500" }} />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-9 h-9 rounded-full z-10" style={{ background: "#160500" }} />
+
           {/* Cuerpo del ticket */}
           <div
-            className="relative overflow-hidden py-3.5 px-10 sm:px-16 text-center"
+            className="relative overflow-hidden py-5 px-12 sm:px-20 text-center"
             style={{
               background: "#FFF8F0",
-              borderTop: "1.5px dashed rgba(193,18,31,0.35)",
-              borderBottom: "1.5px dashed rgba(193,18,31,0.35)",
+              borderTop: "2px dashed rgba(193,18,31,0.5)",
+              borderBottom: "2px dashed rgba(193,18,31,0.5)",
             }}
           >
             {/* Llamas en los bordes */}
-            <div className="absolute left-0 top-0 bottom-0 w-20 pointer-events-none" style={{ background: "linear-gradient(to right, rgba(193,18,31,0.13), transparent)" }} />
-            <div className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none" style={{ background: "linear-gradient(to left, rgba(232,93,4,0.13), transparent)" }} />
-            <p
-              className="relative z-10 font-display tracking-widest leading-tight text-sm sm:text-base"
-              style={{ color: bannerData.tipo === "hoy" ? "#C1121F" : "#E85D04" }}
-            >
+            <div className="absolute left-0 top-0 bottom-0 w-28 pointer-events-none" style={{ background: "linear-gradient(to right, rgba(193,18,31,0.22), transparent)" }} />
+            <div className="absolute right-0 top-0 bottom-0 w-28 pointer-events-none" style={{ background: "linear-gradient(to left, rgba(232,93,4,0.22), transparent)" }} />
+
+            {/* Sello VÁLIDO HOY */}
+            {bannerData.tipo === "hoy" && (
+              <div className="absolute top-3 right-4 rotate-[-10deg] border-2 rounded px-2 py-0.5 opacity-60 pointer-events-none"
+                style={{ borderColor: "#C1121F" }}>
+                <span className="font-display text-[9px] tracking-widest" style={{ color: "#C1121F" }}>VÁLIDO HOY</span>
+              </div>
+            )}
+
+            {/* Título */}
+            <p className="relative z-10 font-display tracking-widest leading-tight text-base sm:text-lg mb-3"
+              style={{ color: bannerData.tipo === "hoy" ? "#C1121F" : "#E85D04" }}>
               {bannerData.titulo}
             </p>
-            <p className="relative z-10 text-xs mt-0.5" style={{ color: "rgba(13,6,2,0.55)" }}>
-              {bannerData.sub}
-            </p>
+
+            {/* Bloques de oferta */}
+            {bannerData.ofertas ? (
+              <div className="relative z-10 flex gap-3 justify-center flex-wrap mb-2">
+                {bannerData.ofertas.map((o, i) => (
+                  <div key={i} className="flex flex-col items-center px-5 py-2.5 rounded-lg"
+                    style={{ border: "1.5px solid rgba(193,18,31,0.35)", background: "rgba(193,18,31,0.05)" }}>
+                    <span className="font-display text-[11px] tracking-widest uppercase" style={{ color: "#4A0A00" }}>{o.label}</span>
+                    <span className="font-display text-3xl tracking-wider leading-tight" style={{ color: "#C1121F" }}>{o.precio}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {/* Subtítulo */}
+            <p className="relative z-10 text-xs mt-1" style={{ color: "rgba(13,6,2,0.5)" }}>{bannerData.sub}</p>
           </div>
         </div>
       )}
 
       <div className="max-w-6xl mx-auto px-4">
         {/* Tabs sticky */}
-        <div className="sticky top-16 z-30 bg-brand-dark/95 backdrop-blur-sm -mx-4 px-4 py-3 border-b border-white/5 mb-6">
-          <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 max-w-6xl mx-auto">
-            {CATEGORIAS.map(cat => {
-              const active = categoriaActiva === cat.id;
-              return (
-                <button key={cat.id} onClick={() => setCategoriaActiva(cat.id)}
-                  className={["flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer",
-                    active ? "bg-brand-primary text-brand-cream" : "bg-brand-gray-800 text-brand-cream/60 hover:text-brand-cream hover:bg-brand-gray-700",
-                  ].join(" ")}>{cat.label}</button>
-              );
-            })}
+        <div className="sticky top-16 z-30 backdrop-blur-sm -mx-4 px-4 py-3 border-b border-white/8 mb-6"
+          style={{ background: "rgba(22,5,0,0.96)" }}>
+          <div className="relative">
+            <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 max-w-6xl mx-auto">
+              {CATEGORIAS.map(cat => {
+                const active = categoriaActiva === cat.id;
+                const isPromo = cat.id === "promos";
+                return (
+                  <button key={cat.id} onClick={() => setCategoriaActiva(cat.id)}
+                    className={[
+                      "flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer",
+                      active
+                        ? "bg-brand-primary text-brand-cream"
+                        : isPromo
+                          ? "bg-brand-gray-800 text-brand-accent hover:bg-brand-gray-700"
+                          : "bg-brand-gray-800 text-brand-cream/60 hover:text-brand-cream hover:bg-brand-gray-700",
+                    ].join(" ")}
+                    style={active ? { boxShadow: "0 0 12px 3px rgba(193,18,31,0.45)" } : undefined}
+                  >
+                    <span>{CAT_ICONS[cat.id] ?? ""}</span>
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Fade derecho — hint de scroll */}
+            <div className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none"
+              style={{ background: "linear-gradient(to left, rgba(22,5,0,0.9), transparent)" }} />
           </div>
         </div>
 
