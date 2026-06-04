@@ -1,8 +1,7 @@
 import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { MenuPageClient } from "@/components/sections/MenuPageClient";
-import { OrderBuilder } from "@/components/sections/OrderBuilder";
+import { MenuOrden } from "@/components/sections/MenuOrden";
 import { getSupabase } from "@/lib/supabase";
 import { MENU_ITEMS, type ItemMenu } from "@/lib/menu-data";
 
@@ -53,8 +52,7 @@ export default async function MenuPage() {
     <>
       <Header />
       <main className="pt-16">
-        <MenuPageClient items={items} promoDia={promoDia} />
-        <OrderBuilder />
+        <MenuOrden items={items} promoDia={promoDia} />
       </main>
       <Footer />
     </>

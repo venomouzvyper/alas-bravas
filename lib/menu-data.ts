@@ -10,6 +10,7 @@ export interface ItemMenu {
   dia?: string;
   spice?: 'mild' | 'medium' | 'hot';
   destacado?: boolean;
+  valorTag?: string;
   emoji: string;
   gradientFrom?: string;
   gradientTo?: string;
@@ -122,6 +123,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     precio: 300,
     acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     dia: 'Viernes',
+    valorTag: 'AHORRÁS L.20',
     emoji: '🎉',
     gradientFrom: '#1A0400',
     gradientTo: '#8B0000',
@@ -134,6 +136,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     precio: 300,
     acompanamientos: ['Tajadas', 'Frijoles fritos', 'Encurtido', 'Aderezos'],
     dia: 'Viernes',
+    valorTag: 'AHORRÁS L.20',
     emoji: '🎉',
     gradientFrom: '#1A0600',
     gradientTo: '#7A1F00',
@@ -148,6 +151,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     dia: 'Mié / Jue',
     spice: 'medium',
     destacado: true,
+    valorTag: '2 ALITAS EXTRA',
     emoji: '🔥',
     gradientFrom: '#200800',
     gradientTo: '#C1121F',
@@ -161,6 +165,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     acompanamientos: ['Papas', 'Kétchup', 'Aderezo de la casa'],
     dia: 'Mié / Jue',
     spice: 'medium',
+    valorTag: '1 ALITA GRATIS',
     emoji: '🔥',
     gradientFrom: '#1A0600',
     gradientTo: '#E85D04',
