@@ -9,6 +9,7 @@ export interface ItemMenu {
   acompanamientos?: string[];
   dia?: string;
   spice?: 'mild' | 'medium' | 'hot';
+  destacado?: boolean;
   emoji: string;
   gradientFrom?: string;
   gradientTo?: string;
@@ -21,9 +22,10 @@ export const MENU_ITEMS: ItemMenu[] = [
     id: 'alitas-6',
     categoria: 'alitas',
     nombre: '6 Alitas',
-    descripcion: 'Crujientes y jugosas. BB o Búfalo a tu elección.',
+    descripcion: 'Piel crocante, carne que se cae del hueso. BB o Búfalo.',
     precio: 180,
     spice: 'medium',
+    destacado: true,
     emoji: '🍗',
     gradientFrom: '#2A1400',
     gradientTo: '#E85D04',
@@ -32,9 +34,10 @@ export const MENU_ITEMS: ItemMenu[] = [
     id: 'alitas-12',
     categoria: 'alitas',
     nombre: '12 Alitas',
-    descripcion: 'La porción grande para compartir. BB o Búfalo.',
+    descripcion: 'La orden para compartir. BB o Búfalo — elige tu veneno.',
     precio: 320,
     spice: 'medium',
+    destacado: true,
     emoji: '🍗',
     gradientFrom: '#1A0A00',
     gradientTo: '#C1121F',
@@ -144,6 +147,7 @@ export const MENU_ITEMS: ItemMenu[] = [
     acompanamientos: ['Papas', 'Kétchup', 'Aderezo de la casa'],
     dia: 'Mié / Jue',
     spice: 'medium',
+    destacado: true,
     emoji: '🔥',
     gradientFrom: '#200800',
     gradientTo: '#C1121F',
@@ -164,11 +168,11 @@ export const MENU_ITEMS: ItemMenu[] = [
 ];
 
 export const CATEGORIAS: { id: Categoria | 'todos'; label: string }[] = [
-  { id: 'todos', label: 'Todos' },
+  { id: 'promos', label: 'Promos ⚡' },
   { id: 'alitas', label: 'Alitas' },
   { id: 'carnes', label: 'Carnes' },
   { id: 'tajadas', label: 'Tajadas' },
   { id: 'pupusas', label: 'Pupusas' },
   { id: 'bebidas', label: 'Bebidas' },
-  { id: 'promos', label: 'Promos ⚡' },
+  { id: 'todos', label: 'Ver todo' },
 ];
