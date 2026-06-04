@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Pulido visual del menú — header scroll-aware, ticket de promo, tabs con íconos, background cálido (ver sección abajo)
+- **Última sesión:** Fix responsiveness mobile — GPU compositing e iOS scroll lock (ver sección abajo)
 
 ---
 
@@ -426,6 +426,39 @@ La opción "Comer aquí" fue eliminada del drawer de checkout. El flujo de reser
 - Tab activo: `bg-brand-primary` + `boxShadow: 0 0 12px 3px rgba(193,18,31,0.45)` glow rojo
 - Fade gradient en borde derecho `w-10` — indica scroll horizontal disponible
 - `lib/menu-data.ts`: label de promos limpiado de "⚡" (el ícono viene de `CAT_ICONS`)
+
+---
+
+## Sesión Fix Responsiveness Mobile ✅
+
+**Objetivo:** Corregir el header y la barra flotante que se "pegaban a la mitad" en smartphones durante el scroll inercial (momentum scroll) de iOS Safari.
+
+### Causas raíz identificadas
+
+**1. `position: fixed` sin GPU compositing**
+iOS Safari no actualiza la posición de elementos `fixed` en tiempo real durante momentum scroll — solo cuando el scroll se detiene. Resultado: el header y la barra flotante aparecen "congelados" en la pantalla fuera de lugar.
+
+**Fix:** `transform: translateZ(0)` en el `<header>` y `willChange: 'transform'` en la barra flotante. Fuerzan al browser a crear una capa GPU propia para cada elemento, donde sí se actualizan durante scroll inercial.
+
+**2. Transición de fuego congelada a mitad de camino**
+iOS Safari pausa CSS transitions durante momentum scroll. La transición `opacity 1→0` de la capa de fuego quedaba congelada al 50% de opacidad ("pegada a la mitad").
+
+**Fix:** `willChange: 'opacity'` en la capa de fuego del header — el browser la mantiene en GPU y no pausa su transición.
+
+**3. Scroll lock del menú móvil no funcionaba en iOS**
+`document.body.style.overflow = "hidden"` no detiene el scroll en iOS Safari. La página scrolleaba por debajo del overlay; al cerrar el menú el header aparecía en posición incorrecta.
+
+**Fix:** Patrón correcto para iOS — `body { position: fixed; top: -${scrollY}px; width: 100% }` al abrir, con restauración exacta de `window.scrollTo(0, scrollY)` al cerrar.
+
+**4. Footer tapado por la barra flotante**
+La barra flotante `fixed bottom-0` en `/menu` cubría el footer. 
+
+**Fix:** `pb-44` en el `<main>` de `app/menu/page.tsx` — empuja el contenido suficiente para que el footer sea accesible incluso con la barra visible.
+
+### Archivos modificados
+- `components/layout/Header.tsx` — GPU layer + scroll lock iOS
+- `components/sections/MenuOrden.tsx` — GPU layer en barra flotante
+- `app/menu/page.tsx` — padding bottom para proteger footer
 
 ---
 
