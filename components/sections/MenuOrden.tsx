@@ -11,17 +11,15 @@ type TipoOrden = "delivery" | "recoger" | "comer-aqui";
 type Sabor = "BB" | "Búfalo";
 interface ItemOrden { cantidad: number; sabor?: Sabor; }
 
+type BannerTipo = "hoy" | "prox";
+interface BannerData { titulo: string; sub: string; tipo: BannerTipo; }
+
 // ── Constantes ────────────────────────────────────────────────────────
 const TIPOS = [
   { id: "delivery"    as TipoOrden, emoji: "🛵", label: "Delivery",     sub: "Vía Mandaditos" },
   { id: "recoger"     as TipoOrden, emoji: "🚶", label: "Para recoger", sub: "Yo lo busco"    },
   { id: "comer-aqui"  as TipoOrden, emoji: "🍽️", label: "Comer aquí",  sub: "En La Cabaña"   },
 ];
-
-const BANNER: Record<NonNullable<PromoDia>, { titulo: string; sub: string }> = {
-  "mie-jue": { titulo: "🔥 HOY: 14 ALITAS POR L.300 · 7 ALITAS POR L.180", sub: "Promos activas hoy — solo miércoles y jueves" },
-  viernes:   { titulo: "🎉 VIERNES: 2 PLATOS POR L.300",                    sub: "Solo hoy · Aprovecha antes de que se acabe"   },
-};
 
 const ACOMP_EMOJI: Record<string, string> = {
   "Tajadas": "🍌", "Frijoles fritos": "🫘", "Encurtido": "🥒", "Aderezos": "🥣",
@@ -81,14 +79,21 @@ function getUpsell(orden: Record<string, ItemOrden>, items: ItemMenu[]): { item:
   }
   return null;
 }
+function getBannerData(): BannerData | null {
+  const d = getHondurasTime().getDay(); // 0=Dom 1=Lun 2=Mar 3=Mié 4=Jue 5=Vie 6=Sáb
+  if (d === 3 || d === 4) return { titulo: "🔥 HOY: 14 ALITAS POR L.300 · 7 ALITAS POR L.180", sub: "Promos activas hoy — solo miércoles y jueves", tipo: "hoy" };
+  if (d === 5) return { titulo: "🎉 VIERNES: 2 PLATOS POR L.300", sub: "Solo hoy · Aprovecha antes de que se acabe", tipo: "hoy" };
+  if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié y jue · Trae a tus amigos", tipo: "prox" };
+  return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos todos los mié, jue y viernes", tipo: "prox" };
+}
 function buildWaMsg(p: {
   tipo: TipoOrden; nombre: string; telefono: string; direccion: string;
   referencia: string; personas: number; notas: string;
   orden: Record<string, ItemOrden>; items: ItemMenu[]; total: number;
 }): string {
   const enc: Record<TipoOrden, string> = {
-    delivery:    `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar con DELIVERY (vía Mandaditos):`,
-    recoger:     `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar PARA RECOGER:`,
+    delivery:     `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar con DELIVERY (vía Mandaditos):`,
+    recoger:      `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar PARA RECOGER:`,
     "comer-aqui": `Hola 👋 Mi nombre es ${p.nombre}. Voy a comer en el restaurante y quisiera ordenar:`,
   };
   const lineas: string[] = [enc[p.tipo], ""];
@@ -125,6 +130,8 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
   onTap: () => void; onCambiar: (d: number) => void; onSabor: (s: Sabor) => void;
 }) {
   const esPromo = item.categoria === "promos";
+  const saborPendiente = necesitaSabor(item) && cantidad > 0 && !sabor;
+
   return (
     <article
       onClick={disponible ? onTap : undefined}
@@ -132,13 +139,17 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
       tabIndex={disponible ? 0 : undefined}
       onKeyDown={disponible ? e => { if (e.key === "Enter" || e.key === " ") onTap(); } : undefined}
       className={[
+        // Altura fija para uniformidad — todos los cards idénticos
+        "h-[290px] sm:h-[340px]",
         "rounded-xl overflow-hidden border transition-all duration-200 flex flex-col",
         disponible ? "cursor-pointer" : "opacity-40",
-        cantidad > 0 ? "border-brand-primary/50 shadow-lg shadow-brand-primary/10" : "border-white/5 hover:border-white/20",
+        cantidad > 0
+          ? "border-brand-primary/50 shadow-lg shadow-brand-primary/10"
+          : "border-white/5 hover:border-white/20",
       ].join(" ")}
     >
-      {/* Imagen */}
-      <div className={`relative overflow-hidden ${esPromo ? "h-36 sm:h-44" : "h-28 sm:h-36"}`}>
+      {/* Imagen — altura fija */}
+      <div className={`relative shrink-0 overflow-hidden ${esPromo ? "h-36 sm:h-40" : "h-28 sm:h-36"}`}>
         {item.image_url ? (
           <Image src={item.image_url} alt={item.nombre} fill sizes="(max-width: 640px) 50vw, 33vw" className="object-cover" />
         ) : (
@@ -147,31 +158,34 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
             {item.emoji}
           </div>
         )}
+        {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {item.destacado && disponible && <span className="bg-brand-accent text-brand-dark text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm">⭐ Top</span>}
           {item.valorTag && disponible && <span className="bg-brand-secondary text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm">{item.valorTag}</span>}
           {item.dia && <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm ${disponible ? "bg-brand-primary text-brand-cream" : "bg-brand-gray-800 text-brand-cream/40"}`}>{disponible ? item.dia : `Solo ${item.dia}`}</span>}
         </div>
+        {/* Burbuja cantidad — dorada si falta salsa */}
         {cantidad > 0 && (
-          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center shadow-md">
-            <span className="text-white text-xs font-black leading-none">{cantidad}</span>
+          <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-md ${saborPendiente ? "bg-brand-accent" : "bg-brand-primary"}`}>
+            <span className={`text-xs font-black leading-none ${saborPendiente ? "text-brand-dark" : "text-white"}`}>{cantidad}</span>
           </div>
         )}
       </div>
 
-      {/* Contenido */}
-      <div className={`bg-brand-gray-900 flex flex-col flex-1 ${esPromo ? "p-4" : "p-3"}`}>
-        <h3 className={`font-display text-brand-cream tracking-wide leading-tight mb-1 ${esPromo ? "text-xl" : "text-sm sm:text-base"}`}>
+      {/* Contenido — overflow-hidden para no romper la altura fija */}
+      <div className={`bg-brand-gray-900 flex flex-col flex-1 overflow-hidden ${esPromo ? "p-4" : "p-3"}`}>
+        <h3 className={`font-display text-brand-cream tracking-wide leading-tight mb-1 line-clamp-1 ${esPromo ? "text-xl" : "text-sm sm:text-base"}`}>
           {item.nombre.toUpperCase()}
         </h3>
-        <p className={`text-brand-cream/50 leading-relaxed line-clamp-2 mb-1 ${esPromo ? "text-sm" : "text-[11px] sm:text-xs"}`}>
+        <p className={`text-brand-cream/50 leading-snug line-clamp-2 mb-1 ${esPromo ? "text-sm" : "text-[11px] sm:text-xs"}`}>
           {item.descripcion}
         </p>
         {!!item.acompanamientos?.length && (
-          <p className={`text-brand-cream/25 leading-relaxed line-clamp-1 mb-2 ${esPromo ? "text-xs" : "text-[10px]"}`}>
+          <p className={`text-brand-cream/25 leading-tight line-clamp-1 mb-2 ${esPromo ? "text-xs" : "text-[10px]"}`}>
             Con: {item.acompanamientos.join(" · ")}
           </p>
         )}
+        {/* Precio + stepper — siempre al pie del contenido */}
         <div className="flex items-center justify-between mt-auto gap-2">
           <p className={`font-display text-brand-accent tracking-wider leading-none ${esPromo ? "text-3xl" : "text-2xl"}`}>
             L.{item.precio}
@@ -191,19 +205,6 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
             </div>
           )}
         </div>
-        <AnimatePresence>
-          {necesitaSabor(item) && cantidad > 0 && (
-            <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: "auto", marginTop: 10 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-brand-cream/30 text-[10px] shrink-0">Salsa:</p>
-                {(["BB", "Búfalo"] as Sabor[]).map(s => (
-                  <button key={s} onClick={() => onSabor(s)} className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${sabor === s ? "bg-brand-primary text-brand-cream" : "bg-brand-gray-800 text-brand-cream/55 hover:text-brand-cream"}`}>{s}</button>
-                ))}
-                {!sabor && <span className="text-brand-accent text-[10px] animate-pulse">← elegí</span>}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </article>
   );
@@ -223,13 +224,12 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
     <>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/80 backdrop-blur-sm" style={{ zIndex: 60 }} onClick={onClose} />
-
       <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
         className="fixed bottom-0 left-0 right-0 bg-brand-dark rounded-t-3xl max-h-[92vh] flex flex-col"
         style={{ zIndex: 60, paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {/* Imagen grande */}
+        {/* Imagen */}
         <div className={`relative shrink-0 rounded-t-3xl overflow-hidden ${item.categoria === "promos" ? "h-56 sm:h-64" : "h-48 sm:h-60"}`}>
           {item.image_url ? (
             <Image src={item.image_url} alt={item.nombre} fill className="object-cover" />
@@ -239,11 +239,8 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
               {item.emoji}
             </div>
           )}
-          {/* Handle */}
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-white/40" />
-          {/* Botón cerrar */}
           <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center text-xl leading-none cursor-pointer" aria-label="Cerrar">×</button>
-          {/* Badges sobre imagen */}
           <div className="absolute bottom-3 left-3 flex gap-1.5 flex-wrap">
             {item.destacado && <span className="bg-brand-accent text-brand-dark text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">⭐ Top</span>}
             {item.valorTag && <span className="bg-brand-secondary text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">{item.valorTag}</span>}
@@ -251,14 +248,10 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
           </div>
         </div>
 
-        {/* Contenido scrolleable */}
+        {/* Contenido */}
         <div className="overflow-y-auto flex-1 px-5 pt-5 pb-3 space-y-5">
-
-          {/* Nombre + precio */}
           <div>
-            <h2 className="font-display text-3xl sm:text-4xl text-brand-cream tracking-wider leading-tight">
-              {item.nombre.toUpperCase()}
-            </h2>
+            <h2 className="font-display text-3xl sm:text-4xl text-brand-cream tracking-wider leading-tight">{item.nombre.toUpperCase()}</h2>
             <div className="flex items-center gap-3 mt-2">
               <p className="font-display text-4xl text-brand-accent tracking-wider">L.{item.precio}</p>
               {item.precioRegular && (
@@ -269,11 +262,7 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
               )}
             </div>
           </div>
-
-          {/* Descripción completa */}
           <p className="text-brand-cream/60 text-sm leading-relaxed">{item.descripcion}</p>
-
-          {/* Acompañamientos como chips */}
           {!!item.acompanamientos?.length && (
             <div>
               <p className="text-brand-cream/30 text-[10px] uppercase tracking-widest font-bold mb-2">Incluye</p>
@@ -286,8 +275,6 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
               </div>
             </div>
           )}
-
-          {/* Selector de salsa */}
           {necesitaSabor(item) && (
             <div>
               <p className={`text-[10px] uppercase tracking-widest font-bold mb-2 transition-colors ${saborError ? "text-brand-primary" : "text-brand-cream/30"}`}>
@@ -305,8 +292,6 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
               </div>
             </div>
           )}
-
-          {/* Cross-sell */}
           {crossSell.length > 0 && (
             <div>
               <p className="text-brand-cream/30 text-[10px] uppercase tracking-widest font-bold mb-3">Va bien con esto</p>
@@ -329,7 +314,7 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
           )}
         </div>
 
-        {/* Footer: stepper + CTA */}
+        {/* Footer */}
         <div className="px-5 py-4 border-t border-white/5 shrink-0">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 shrink-0">
@@ -366,25 +351,28 @@ export function MenuOrden({ items, promoDia }: Props) {
   const [saborError, setSaborError]     = useState(false);
 
   // Checkout
-  const [tipo, setTipo]               = useState<TipoOrden | null>(null);
-  const [nombre, setNombre]           = useState("");
-  const [telefono, setTelefono]       = useState("");
-  const [direccion, setDireccion]     = useState("");
-  const [referencia, setReferencia]   = useState("");
-  const [personas, setPersonas]       = useState(2);
-  const [notas, setNotas]             = useState("");
+  const [tipo, setTipo]             = useState<TipoOrden | null>(null);
+  const [nombre, setNombre]         = useState("");
+  const [telefono, setTelefono]     = useState("");
+  const [direccion, setDireccion]   = useState("");
+  const [referencia, setReferencia] = useState("");
+  const [personas, setPersonas]     = useState(2);
+  const [notas, setNotas]           = useState("");
 
-  const abierto = estaAbierto();
+  const abierto     = estaAbierto();
+  const bannerData  = useMemo(() => getBannerData(), []);
 
   useEffect(() => {
     document.body.style.overflow = (drawerOpen || !!detalleItem) ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [drawerOpen, detalleItem]);
 
-  const itemsFiltrados = useMemo(
-    () => categoriaActiva === "todos" ? items : items.filter(i => i.categoria === categoriaActiva),
-    [items, categoriaActiva]
-  );
+  const itemsFiltrados = useMemo(() => {
+    let filtered = categoriaActiva === "todos" ? items : items.filter(i => i.categoria === categoriaActiva);
+    // En la tab de promos, solo mostrar las del día
+    if (categoriaActiva === "promos") filtered = filtered.filter(i => isDisponible(i));
+    return filtered;
+  }, [items, categoriaActiva]);
 
   const { total, itemCount, sinSabor } = useMemo(() => {
     let total = 0, itemCount = 0, sinSabor = false;
@@ -444,16 +432,14 @@ export function MenuOrden({ items, promoDia }: Props) {
     ? buildWaMsg({ tipo: tipo!, nombre, telefono, direccion, referencia, personas, notas, orden, items, total })
     : "#";
 
-  const banner = promoDia ? BANNER[promoDia] : null;
-
   return (
     <section className="bg-brand-dark pb-8">
 
-      {/* Banner del día */}
-      {banner && (
-        <div className="bg-brand-primary py-3 px-4 text-center">
-          <p className="text-brand-cream font-bold text-sm uppercase tracking-wider leading-tight">{banner.titulo}</p>
-          <p className="text-brand-cream/70 text-xs mt-1">{banner.sub}</p>
+      {/* Banner contextual del día */}
+      {bannerData && (
+        <div className={`py-3 px-4 text-center ${bannerData.tipo === "hoy" ? "bg-brand-primary" : "bg-brand-secondary"}`}>
+          <p className="text-brand-cream font-bold text-sm uppercase tracking-wider leading-tight">{bannerData.titulo}</p>
+          <p className="text-brand-cream/75 text-xs mt-1">{bannerData.sub}</p>
         </div>
       )}
 
@@ -476,7 +462,7 @@ export function MenuOrden({ items, promoDia }: Props) {
         {/* Grid */}
         <motion.div layout className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <AnimatePresence mode="popLayout">
-            {itemsFiltrados.map(item => (
+            {itemsFiltrados.length > 0 ? itemsFiltrados.map(item => (
               <motion.div key={item.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2 }}
                 className={item.categoria === "promos" ? "col-span-2 sm:col-span-1" : ""}>
                 <MenuCard
@@ -489,12 +475,18 @@ export function MenuOrden({ items, promoDia }: Props) {
                   onSabor={s => cambiarSabor(item.id, s)}
                 />
               </motion.div>
-            ))}
+            )) : categoriaActiva === "promos" ? (
+              <motion.div key="empty-promos" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-2 lg:col-span-3 py-16 text-center">
+                <p className="text-5xl mb-4">🔥</p>
+                <p className="font-display text-2xl text-brand-cream tracking-wider">VOLVÉ EL MIÉRCOLES</p>
+                <p className="text-brand-cream/40 text-sm mt-2">Promos especiales los mié, jue y viernes</p>
+              </motion.div>
+            ) : null}
           </AnimatePresence>
         </motion.div>
       </div>
 
-      {/* Barra flotante */}
+      {/* Barra flotante con animación de llamas */}
       <AnimatePresence>
         {itemCount > 0 && (
           <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
@@ -502,10 +494,18 @@ export function MenuOrden({ items, promoDia }: Props) {
             className="fixed bottom-0 left-0 right-0 z-40 px-3"
             style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
             <button onClick={() => setDrawerOpen(true)}
-              className="w-full max-w-lg mx-auto flex items-center justify-between px-5 py-4 rounded-2xl font-bold text-white shadow-2xl shadow-black/60 cursor-pointer transition-all active:scale-[0.98]"
-              style={{ background: "#25D366", display: "flex" }}>
-              <span className="text-sm opacity-85">{itemCount} {itemCount === 1 ? "ítem" : "ítems"}</span>
-              <span className="flex items-center gap-2 text-base"><WaIcon />Ver pedido · L.{total}</span>
+              className="relative w-full max-w-lg mx-auto flex items-center justify-between px-5 py-4 rounded-2xl font-bold text-brand-cream shadow-2xl shadow-black/60 cursor-pointer transition-all active:scale-[0.98] overflow-hidden"
+              style={{ background: "#1A0400", display: "flex" }}>
+              {/* Llamas — exactamente igual que el hero */}
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: "radial-gradient(ellipse 85% 65% at 50% 50%, rgba(232,93,4,0.55) 0%, rgba(193,18,31,0.4) 45%, transparent 72%)" }} />
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: "radial-gradient(ellipse 55% 80% at 22% 50%, rgba(193,18,31,0.5) 0%, transparent 70%)", animation: "glow-left 7s ease-in-out infinite" }} />
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: "radial-gradient(ellipse 55% 80% at 78% 50%, rgba(232,93,4,0.5) 0%, transparent 70%)", animation: "glow-right 7s ease-in-out infinite" }} />
+              {/* Contenido sobre las llamas */}
+              <span className="relative z-10 text-sm text-brand-cream/80">{itemCount} {itemCount === 1 ? "ítem" : "ítems"}</span>
+              <span className="relative z-10 font-display text-xl tracking-wider">VER PEDIDO · L.{total}</span>
             </button>
           </motion.div>
         )}
@@ -550,24 +550,34 @@ export function MenuOrden({ items, promoDia }: Props) {
                     const item = items.find(i => i.id === id);
                     if (!item) return null;
                     return (
-                      <div key={id} className="flex items-center gap-3">
-                        <span className="text-2xl shrink-0">{item.emoji}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-brand-cream/80 text-sm font-semibold truncate">{item.nombre}</p>
-                          {necesitaSabor(item) && (
-                            ord.sabor
-                              ? <p className="text-brand-accent text-xs">Salsa: {ord.sabor}</p>
-                              : <p className="text-brand-primary text-xs animate-pulse">Salsa pendiente ↑</p>
-                          )}
+                      <div key={id}>
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl shrink-0">{item.emoji}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-brand-cream/80 text-sm font-semibold truncate">{item.nombre}</p>
+                            {necesitaSabor(item) && ord.sabor && (
+                              <p className="text-brand-accent text-xs">Salsa: {ord.sabor}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button onClick={() => cambiarCantidad(id, -1)} className="w-7 h-7 rounded-full bg-brand-gray-800 hover:bg-brand-gray-700 text-brand-cream text-sm font-bold active:scale-90 cursor-pointer flex items-center justify-center">−</button>
+                            <span className="w-5 text-center text-sm font-bold text-brand-cream tabular-nums">{ord.cantidad}</span>
+                            <button onClick={() => cambiarCantidad(id, 1)} disabled={ord.cantidad >= 20} className="w-7 h-7 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold disabled:opacity-25 active:scale-90 cursor-pointer flex items-center justify-center">+</button>
+                          </div>
+                          <p className="text-brand-accent font-bold text-sm shrink-0 w-14 text-right">L.{item.precio * ord.cantidad}</p>
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button onClick={() => cambiarCantidad(id, -1)}
-                            className="w-7 h-7 rounded-full bg-brand-gray-800 hover:bg-brand-gray-700 text-brand-cream text-sm font-bold active:scale-90 cursor-pointer flex items-center justify-center">−</button>
-                          <span className="w-5 text-center text-sm font-bold text-brand-cream tabular-nums">{ord.cantidad}</span>
-                          <button onClick={() => cambiarCantidad(id, 1)} disabled={ord.cantidad >= 20}
-                            className="w-7 h-7 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold disabled:opacity-25 active:scale-90 cursor-pointer flex items-center justify-center">+</button>
-                        </div>
-                        <p className="text-brand-accent font-bold text-sm shrink-0 w-14 text-right">L.{item.precio * ord.cantidad}</p>
+                        {/* Selector de salsa inline — aparece si falta elegir */}
+                        {necesitaSabor(item) && !ord.sabor && (
+                          <div className="flex items-center gap-2 mt-2 pl-10">
+                            <span className="text-brand-primary text-[10px] font-bold animate-pulse shrink-0">Salsa:</span>
+                            {(["BB", "Búfalo"] as Sabor[]).map(s => (
+                              <button key={s} onClick={() => cambiarSabor(id, s)}
+                                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-gray-800 hover:bg-brand-primary text-brand-cream/70 hover:text-brand-cream transition-all cursor-pointer border border-brand-primary/40">
+                                {s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -650,8 +660,8 @@ export function MenuOrden({ items, promoDia }: Props) {
                 </div>
               </div>
 
-              {/* CTA */}
-              <div className="px-5 py-4 border-t border-white/5 shrink-0">
+              {/* CTA + aviso de pago */}
+              <div className="px-5 pt-3 pb-4 border-t border-white/5 shrink-0 space-y-3">
                 {puedeEnviar ? (
                   <a href={waLink} target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-white transition-all hover:opacity-90 active:scale-95"
@@ -663,6 +673,9 @@ export function MenuOrden({ items, promoDia }: Props) {
                     {motivoInhabilitar ?? "Completá tu pedido"}
                   </button>
                 )}
+                <p className="text-brand-cream/30 text-xs text-center">
+                  Sin cobro online · pagás al recibir tu pedido
+                </p>
               </div>
             </motion.div>
           </>
@@ -673,10 +686,7 @@ export function MenuOrden({ items, promoDia }: Props) {
       <AnimatePresence>
         {detalleItem && (
           <ItemDetailSheet
-            item={detalleItem}
-            items={items}
-            local={detalleLocal}
-            saborError={saborError}
+            item={detalleItem} items={items} local={detalleLocal} saborError={saborError}
             onLocalChange={l => { setDetalleLocal(l); setSaborError(false); }}
             onAgregar={aplicarDetalle}
             onClose={() => setDetalleItem(null)}
