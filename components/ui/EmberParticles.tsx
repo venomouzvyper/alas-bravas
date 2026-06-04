@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 const COLORS = ['#C1121F', '#E85D04', '#FFB703', '#FF6B1A'];
-const MAX_PARTICLES = 55;
+interface EmberParticlesProps { mini?: boolean; }
 
 interface Particle {
   x: number;
@@ -16,20 +16,20 @@ interface Particle {
   color: string;
 }
 
-function spawn(width: number, height: number): Particle {
+function spawn(width: number, height: number, mini: boolean): Particle {
   return {
     x: Math.random() * width,
     y: height + 8,
     vx: (Math.random() - 0.5) * 0.8,
-    vy: -(Math.random() * 1.4 + 0.6),
-    size: Math.random() * 2.2 + 0.8,
+    vy: mini ? -(Math.random() * 0.5 + 0.3) : -(Math.random() * 1.4 + 0.6),
+    size: mini ? Math.random() * 1.0 + 0.5 : Math.random() * 2.2 + 0.8,
     opacity: Math.random() * 0.5 + 0.5,
-    decay: Math.random() * 0.007 + 0.004,
+    decay: mini ? Math.random() * 0.006 + 0.003 : Math.random() * 0.007 + 0.004,
     color: COLORS[Math.floor(Math.random() * COLORS.length)],
   };
 }
 
-export function EmberParticles() {
+export function EmberParticles({ mini = false }: EmberParticlesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -38,6 +38,7 @@ export function EmberParticles() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const MAX_PARTICLES = mini ? 7 : 55;
     let particles: Particle[] = [];
     let raf: number;
 
@@ -54,7 +55,7 @@ export function EmberParticles() {
 
       // Reponer partículas
       while (particles.length < MAX_PARTICLES) {
-        particles.push(spawn(canvas.width, canvas.height));
+        particles.push(spawn(canvas.width, canvas.height, mini));
       }
 
       // Actualizar y dibujar

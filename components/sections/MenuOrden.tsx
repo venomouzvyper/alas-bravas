@@ -5,9 +5,10 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { CATEGORIAS, type ItemMenu, type Categoria } from "@/lib/menu-data";
 import type { PromoDia } from "@/app/menu/page";
+import { EmberParticles } from "@/components/ui/EmberParticles";
 
 // ── Types ─────────────────────────────────────────────────────────────
-type TipoOrden = "delivery" | "recoger" | "comer-aqui";
+type TipoOrden = "delivery" | "recoger";
 type Sabor = "BB" | "Búfalo";
 interface ItemOrden { cantidad: number; sabor?: Sabor; }
 
@@ -16,9 +17,8 @@ interface BannerData { titulo: string; sub: string; tipo: BannerTipo; }
 
 // ── Constantes ────────────────────────────────────────────────────────
 const TIPOS = [
-  { id: "delivery"    as TipoOrden, emoji: "🛵", label: "Delivery",     sub: "Vía Mandaditos" },
-  { id: "recoger"     as TipoOrden, emoji: "🚶", label: "Para recoger", sub: "Yo lo busco"    },
-  { id: "comer-aqui"  as TipoOrden, emoji: "🍽️", label: "Comer aquí",  sub: "En La Cabaña"   },
+  { id: "delivery" as TipoOrden, emoji: "🛵", label: "Delivery",     sub: "Vía Mandaditos" },
+  { id: "recoger"  as TipoOrden, emoji: "🚶", label: "Para recoger", sub: "Yo lo busco"    },
 ];
 
 const ACOMP_EMOJI: Record<string, string> = {
@@ -88,13 +88,12 @@ function getBannerData(): BannerData | null {
 }
 function buildWaMsg(p: {
   tipo: TipoOrden; nombre: string; telefono: string; direccion: string;
-  referencia: string; personas: number; notas: string;
+  referencia: string; notas: string;
   orden: Record<string, ItemOrden>; items: ItemMenu[]; total: number;
 }): string {
   const enc: Record<TipoOrden, string> = {
-    delivery:     `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar con DELIVERY (vía Mandaditos):`,
-    recoger:      `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar PARA RECOGER:`,
-    "comer-aqui": `Hola 👋 Mi nombre es ${p.nombre}. Voy a comer en el restaurante y quisiera ordenar:`,
+    delivery: `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar con DELIVERY (vía Mandaditos):`,
+    recoger:  `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar PARA RECOGER:`,
   };
   const lineas: string[] = [enc[p.tipo], ""];
   p.items.forEach(item => {
@@ -112,7 +111,6 @@ function buildWaMsg(p: {
     if (p.referencia.trim()) lineas.push(`   Referencia: ${p.referencia}`);
     lineas.push(`📞 Tel: ${p.telefono}`);
   }
-  if (p.tipo === "comer-aqui" && p.personas > 1) lineas.push(`👥 Somos ${p.personas} personas`);
   if (p.notas.trim()) lineas.push(`📝 Nota: ${p.notas.trim()}`);
   return `https://wa.me/50432462305?text=${encodeURIComponent(lineas.join("\n"))}`;
 }
@@ -356,7 +354,6 @@ export function MenuOrden({ items, promoDia }: Props) {
   const [telefono, setTelefono]     = useState("");
   const [direccion, setDireccion]   = useState("");
   const [referencia, setReferencia] = useState("");
-  const [personas, setPersonas]     = useState(2);
   const [notas, setNotas]           = useState("");
 
   const abierto     = estaAbierto();
@@ -388,6 +385,15 @@ export function MenuOrden({ items, promoDia }: Props) {
   }, [orden, items]);
 
   const upsell = useMemo(() => getUpsell(orden, items), [orden, items]);
+  const itemsEnOrden = useMemo(() =>
+    Object.entries(orden)
+      .filter(([, ord]) => ord.cantidad > 0)
+      .flatMap(([id, ord]) => {
+        const item = items.find(i => i.id === id);
+        return item ? [{ item, ord }] : [];
+      }),
+    [orden, items]
+  );
 
   function cambiarCantidad(id: string, delta: number) {
     setOrden(prev => {
@@ -429,7 +435,7 @@ export function MenuOrden({ items, promoDia }: Props) {
     null;
 
   const waLink = puedeEnviar
-    ? buildWaMsg({ tipo: tipo!, nombre, telefono, direccion, referencia, personas, notas, orden, items, total })
+    ? buildWaMsg({ tipo: tipo!, nombre, telefono, direccion, referencia, notas, orden, items, total })
     : "#";
 
   return (
@@ -486,7 +492,7 @@ export function MenuOrden({ items, promoDia }: Props) {
         </motion.div>
       </div>
 
-      {/* Barra flotante con animación de llamas */}
+      {/* Barra flotante */}
       <AnimatePresence>
         {itemCount > 0 && (
           <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
@@ -494,18 +500,37 @@ export function MenuOrden({ items, promoDia }: Props) {
             className="fixed bottom-0 left-0 right-0 z-40 px-3"
             style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
             <button onClick={() => setDrawerOpen(true)}
-              className="relative w-full max-w-lg mx-auto flex items-center justify-between px-5 py-4 rounded-2xl font-bold text-brand-cream shadow-2xl shadow-black/60 cursor-pointer transition-all active:scale-[0.98] overflow-hidden"
-              style={{ background: "#1A0400", display: "flex" }}>
-              {/* Llamas — exactamente igual que el hero */}
+              className="relative w-full max-w-lg mx-auto rounded-2xl font-bold text-brand-cream shadow-2xl shadow-black/60 cursor-pointer transition-transform active:scale-[0.98] overflow-hidden block"
+              style={{ background: "#1A0400" }}>
+              {/* Glow central — mismos valores que el hero */}
               <div className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 85% 65% at 50% 50%, rgba(232,93,4,0.55) 0%, rgba(193,18,31,0.4) 45%, transparent 72%)" }} />
+                style={{ background: "radial-gradient(ellipse 85% 65% at 50% 50%, #E85D04 0%, #C1121F 38%, transparent 68%)", opacity: 0.38 }} />
+              {/* Glows flotantes animados */}
               <div className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 55% 80% at 22% 50%, rgba(193,18,31,0.5) 0%, transparent 70%)", animation: "glow-left 7s ease-in-out infinite" }} />
+                style={{ background: "radial-gradient(ellipse 55% 80% at 22% 50%, rgba(193,18,31,0.22) 0%, transparent 70%)", animation: "glow-left 7s ease-in-out infinite" }} />
               <div className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 55% 80% at 78% 50%, rgba(232,93,4,0.5) 0%, transparent 70%)", animation: "glow-right 7s ease-in-out infinite" }} />
-              {/* Contenido sobre las llamas */}
-              <span className="relative z-10 text-sm text-brand-cream/80">{itemCount} {itemCount === 1 ? "ítem" : "ítems"}</span>
-              <span className="relative z-10 font-display text-xl tracking-wider">VER PEDIDO · L.{total}</span>
+                style={{ background: "radial-gradient(ellipse 55% 80% at 78% 50%, rgba(232,93,4,0.22) 0%, transparent 70%)", animation: "glow-right 7s ease-in-out infinite" }} />
+              {/* Overlay oscuro para profundidad */}
+              <div className="absolute inset-0 bg-brand-dark/45 pointer-events-none" />
+              {/* Brasas mini */}
+              <EmberParticles mini />
+              {/* Ítems en pedido */}
+              <div className="relative z-10 px-5 pt-3 pb-2 border-b border-white/8">
+                {itemsEnOrden.slice(0, 3).map(({ item, ord }) => (
+                  <div key={item.id} className="flex items-center justify-between gap-3 py-0.5">
+                    <span className="text-brand-cream/70 text-xs">{item.nombre}</span>
+                    <span className="text-brand-accent text-xs font-bold shrink-0">×{ord.cantidad}</span>
+                  </div>
+                ))}
+                {itemsEnOrden.length > 3 && (
+                  <p className="text-brand-cream/35 text-[10px] mt-1">+{itemsEnOrden.length - 3} más</p>
+                )}
+              </div>
+              {/* CTA */}
+              <div className="relative z-10 flex items-center justify-between px-5 py-4">
+                <span className="text-sm text-brand-cream/70">{itemCount} {itemCount === 1 ? "ítem" : "ítems"}</span>
+                <span className="font-display text-xl tracking-wider">VER PEDIDO · L.{total}</span>
+              </div>
             </button>
           </motion.div>
         )}
@@ -608,7 +633,7 @@ export function MenuOrden({ items, promoDia }: Props) {
                     <span className="w-4 h-4 rounded-full bg-brand-primary text-brand-cream text-[9px] flex items-center justify-center font-black shrink-0">1</span>
                     ¿Cómo lo querés?
                   </p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {TIPOS.map(t => (
                       <button key={t.id} onClick={() => setTipo(t.id)}
                         className={["flex flex-col items-center justify-center gap-1 py-3 px-1.5 rounded-xl border-2 transition-all duration-200 cursor-pointer text-center",
@@ -645,15 +670,6 @@ export function MenuOrden({ items, promoDia }: Props) {
                         </div>
                       </>
                     )}
-                    {tipo === "comer-aqui" && (
-                      <div className="flex items-center gap-4 bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3">
-                        <p className="text-brand-cream/40 text-xs flex-1">¿Cuántos son?</p>
-                        <button onClick={() => setPersonas(p => Math.max(1, p - 1))} disabled={personas === 1} className="w-8 h-8 rounded-full bg-brand-gray-800 text-brand-cream font-bold disabled:opacity-25 active:scale-90 cursor-pointer flex items-center justify-center">−</button>
-                        <span className="font-display text-2xl text-brand-cream w-8 text-center leading-none">{personas}</span>
-                        <button onClick={() => setPersonas(p => Math.min(30, p + 1))} className="w-8 h-8 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream font-bold active:scale-90 cursor-pointer flex items-center justify-center">+</button>
-                        <span className="text-brand-cream/30 text-xs">{personas === 1 ? "persona" : "personas"}</span>
-                      </div>
-                    )}
                     <textarea value={notas} onChange={e => setNotas(e.target.value)} placeholder="Notas: sin encurtido, salsa aparte... (opcional)" rows={2}
                       className="w-full bg-brand-gray-900 border border-white/10 rounded-xl px-4 py-3 text-brand-cream text-sm placeholder:text-brand-cream/20 focus:outline-none focus:border-brand-primary/60 transition-colors resize-none" />
                   </div>
@@ -662,6 +678,13 @@ export function MenuOrden({ items, promoDia }: Props) {
 
               {/* CTA + aviso de pago */}
               <div className="px-5 pt-3 pb-4 border-t border-white/5 shrink-0 space-y-3">
+                <div className="flex items-center gap-3 bg-brand-gray-900 border border-brand-accent/25 rounded-xl px-4 py-3">
+                  <span className="text-xl shrink-0">💵</span>
+                  <div>
+                    <p className="text-brand-cream text-sm font-bold">Pagás al recibir tu pedido</p>
+                    <p className="text-brand-cream/45 text-xs mt-0.5">Sin cobro online · sin tarjeta necesaria</p>
+                  </div>
+                </div>
                 {puedeEnviar ? (
                   <a href={waLink} target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-white transition-all hover:opacity-90 active:scale-95"
@@ -673,9 +696,6 @@ export function MenuOrden({ items, promoDia }: Props) {
                     {motivoInhabilitar ?? "Completá tu pedido"}
                   </button>
                 )}
-                <p className="text-brand-cream/30 text-xs text-center">
-                  Sin cobro online · pagás al recibir tu pedido
-                </p>
               </div>
             </motion.div>
           </>
