@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Checkout wizard — rediseño completo del flujo de pedido (ver sección abajo)
+- **Última sesión:** Pulido visual del menú — header scroll-aware, ticket de promo, tabs con íconos, background cálido (ver sección abajo)
 
 ---
 
@@ -376,11 +376,56 @@ Reemplaza el drawer de formulario único. Estructura fija:
 
 ### Deploy
 
-Vercel CLI instalada en `~/.local/bin/vercel`. El auto-deploy de GitHub→Vercel dejó de funcionar; usar `~/.local/bin/vercel --prod` para deployar manualmente desde el repo.
+Solo `git push origin main` — el auto-deploy GitHub→Vercel está activo. **No usar la CLI** (`vercel --prod`): genera deployments duplicados en el dashboard de Vercel.
 
 ### "Comer aquí" → Reservaciones
 
 La opción "Comer aquí" fue eliminada del drawer de checkout. El flujo de reservación vive en `/reservaciones` (ya existente con campos: nombre, teléfono, fecha, hora, personas, notas). Pendiente: mejoras visuales a esa página para consistencia con la marca.
+
+---
+
+## Sesión Pulido Visual del Menú ✅
+
+**Objetivo:** Cohesión visual completa de `/menu` — header con identidad de fuego, banner persuasivo, cards legibles, tabs profesionales.
+
+### Header scroll-aware (`components/layout/Header.tsx`)
+- Al top de página: fondo `linear-gradient(to right, #C1121F → #E85D04)` + `EmberParticles mini` con brasas doradas `["#FFD700","#FFED4A","#FFF176","#FFB703"]`
+- Al scrollear 60px: transición `opacity 500ms` a fondo `#0D0602` oscuro
+- Texto siempre blanco con `textShadow: "0 1px 4px rgba(0,0,0,0.55)"` — legible en ambos estados
+- Botón "Reservar": pill crema (`bg-brand-cream text-brand-dark`) sobre fuego → pill rojo (`bg-brand-primary`) sobre oscuro
+- Hamburger: líneas blancas en todos los estados
+- Menú móvil overlay: sigue en `bg-brand-dark` (sin fuego)
+
+### Banner ticket físico (`MenuOrden.tsx` — `getBannerData`)
+- **Patrón *pattern interrupt*:** fondo crema `#FFF8F0` — único elemento luminoso en una página oscura. Máximo contraste contra header de fuego y fondo oscuro.
+- Muescas semicirculares `w-9 h-9` en bordes laterales — ilusión de boleto perforado
+- Bordes punteados `2px dashed rgba(193,18,31,0.5)` arriba y abajo
+- Llamas en bordes: gradientes `rgba(193,18,31,0.22)` izq / `rgba(232,93,4,0.22)` der, ancho `w-28`
+- Sello "VÁLIDO HOY" rotado `−10deg` en esquina superior derecha (solo tipo "hoy")
+- **Ofertas separadas:** `getBannerData()` retorna `ofertas: {label, precio}[]` — cada promo es un bloque independiente con precio grande en `#C1121F`
+  - Mié/Jue: dos bloques → "14 ALITAS BB O BÚFALO L.300" + "7 ALITAS BB O BÚFALO L.180"
+  - Viernes: un bloque → "2 PLATOS A ELEGIR L.300"
+
+### Background sección `/menu`
+- `#160500` — negro cálido en lugar de `#0D0602` frío. Conecta visualmente el ticket crema con el contenido sin gradientes adicionales.
+- El sticky de tabs usa `rgba(22,5,0,0.96)` para consistencia al hacer scroll.
+
+### Cards — layout dinámico (`MenuCard`)
+- Contenedor texto: `flex flex-col justify-between` — nombre, descripción y precio se distribuyen en todo el espacio disponible automáticamente
+- Fuentes subidas: nombre `text-base sm:text-lg`, descripción `text-xs sm:text-sm`, acompañamientos `text-[11px] sm:text-xs`
+- Área de imagen sin cambios (`h-28 sm:h-36` / `h-36 sm:h-40`) — reservada para fotos reales
+
+### Botón `+` — animación de respiración
+- Reemplaza el `animate-ping` agresivo
+- Clase `.btn-breathe` en `globals.css`: `@keyframes btn-breathe` cicla el `box-shadow` entre intensidad baja y alta cada 3.5s
+- Presente y vivo, sin ser invasivo
+
+### Tabs de categoría — rediseño
+- Ícono + texto en cada tab: `CAT_ICONS` mapeado localmente (`🍗 Alitas`, `🥩 Carnes`, `🍌 Tajadas`, `🫓 Pupusas`, `🥤 Bebidas`, `⚡ Promos`, `◈ Ver todo`)
+- "Promos" siempre en `text-brand-accent` dorado aunque inactivo — mayor jerarquía visual
+- Tab activo: `bg-brand-primary` + `boxShadow: 0 0 12px 3px rgba(193,18,31,0.45)` glow rojo
+- Fade gradient en borde derecho `w-10` — indica scroll horizontal disponible
+- `lib/menu-data.ts`: label de promos limpiado de "⚡" (el ícono viene de `CAT_ICONS`)
 
 ---
 
