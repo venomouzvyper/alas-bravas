@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { EmberParticles } from "@/components/ui/EmberParticles";
 
 const navLinks = [
   { label: "Menú", href: "/menu" },
@@ -19,7 +20,15 @@ const InstagramIcon = () => (
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Bloquea scroll del body mientras el menú móvil está visible
   useEffect(() => {
@@ -35,8 +44,21 @@ export function Header() {
   return (
     <>
       {/* ── Barra fija ─────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-brand-dark/95 backdrop-blur-md border-b border-brand-primary/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 overflow-hidden border-b border-brand-primary/20"
+        style={{ background: "#0D0602" }}
+      >
+        {/* Capa de fuego — se desvanece al hacer scroll */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+          style={{
+            background: "linear-gradient(to right, #C1121F 0%, #E85D04 100%)",
+            opacity: scrolled ? 0 : 1,
+          }}
+        >
+          <EmberParticles mini colors={["#FFD700", "#FFED4A", "#FFF176", "#FFB703"]} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
             {/* Logo + nombre */}
@@ -54,7 +76,10 @@ export function Header() {
                 className="object-contain"
                 priority
               />
-              <span className="font-display text-lg tracking-[0.1em] text-brand-cream leading-none">
+              <span
+                className="font-display text-lg tracking-[0.1em] text-white leading-none"
+                style={{ textShadow: "0 1px 4px rgba(0,0,0,0.55)" }}
+              >
                 ALAS BRAVAS
               </span>
             </Link>
@@ -67,12 +92,13 @@ export function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    style={{ textShadow: "0 1px 4px rgba(0,0,0,0.55)" }}
                     className={[
                       "relative text-sm font-semibold uppercase tracking-wider pb-1 transition-colors duration-200",
                       "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-brand-accent after:transition-all after:duration-200",
                       active
                         ? "text-brand-accent after:w-full"
-                        : "text-brand-cream/65 hover:text-brand-cream after:w-0 hover:after:w-full",
+                        : "text-white/80 hover:text-white after:w-0 hover:after:w-full",
                     ].join(" ")}
                   >
                     {link.label}
@@ -88,7 +114,8 @@ export function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram @alasbravas1709"
-                className="hidden sm:block text-brand-cream/50 hover:text-brand-accent transition-colors"
+                className="hidden sm:block text-white/70 hover:text-white transition-colors"
+                style={{ textShadow: "0 1px 4px rgba(0,0,0,0.55)" }}
               >
                 <InstagramIcon />
               </a>
@@ -97,8 +124,11 @@ export function Header() {
                 href="/reservaciones"
                 className={[
                   "hidden md:inline-flex items-center px-5 py-2 rounded-full",
-                  "bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold tracking-wide uppercase transition-colors duration-200",
+                  "text-sm font-bold tracking-wide uppercase transition-all duration-500",
                   pathname === "/reservaciones" ? "opacity-50 pointer-events-none" : "",
+                  scrolled
+                    ? "bg-brand-primary hover:bg-red-700 text-brand-cream"
+                    : "bg-brand-cream text-brand-dark hover:bg-white",
                 ].join(" ")}
               >
                 Reservar
@@ -111,9 +141,9 @@ export function Header() {
                 aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                 aria-expanded={menuOpen}
               >
-                <span className={`block w-6 h-[2px] bg-brand-cream rounded-full transition-all duration-300 origin-center ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
-                <span className={`block w-6 h-[2px] bg-brand-cream rounded-full transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
-                <span className={`block w-6 h-[2px] bg-brand-cream rounded-full transition-all duration-300 origin-center ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
+                <span className={`block w-6 h-[2px] bg-white rounded-full transition-all duration-300 origin-center ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
+                <span className={`block w-6 h-[2px] bg-white rounded-full transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
+                <span className={`block w-6 h-[2px] bg-white rounded-full transition-all duration-300 origin-center ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
               </button>
             </div>
           </div>
