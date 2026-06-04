@@ -51,7 +51,7 @@ export default async function MenuPage() {
   return (
     <>
       <Header />
-      <main className="pt-16">
+      <main className="pt-16 pb-44">
         <MenuOrden items={items} promoDia={promoDia} />
       </main>
       <Footer />

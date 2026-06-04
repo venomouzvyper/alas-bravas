@@ -646,7 +646,10 @@ export function MenuOrden({ items, promoDia }: Props) {
           <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-40 px-3"
-            style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+            style={{
+              paddingBottom: "max(12px, env(safe-area-inset-bottom))",
+              willChange: "transform",
+            }}>
             <button onClick={openDrawer}
               className="relative w-full max-w-lg mx-auto rounded-2xl overflow-hidden cursor-pointer transition-transform active:scale-[0.98] block"
               style={{ boxShadow: "0 8px 32px rgba(193,18,31,0.45)" }}>

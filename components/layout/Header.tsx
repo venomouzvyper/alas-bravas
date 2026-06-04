@@ -30,10 +30,29 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Bloquea scroll del body mientras el menú móvil está visible
+  // Bloquea scroll en iOS Safari: overflow:hidden solo no funciona en iOS
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (menuOpen) {
+      const scrollY = window.scrollY;
+      document.body.dataset.scrollY = String(scrollY);
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+    } else {
+      const scrollY = parseInt(document.body.dataset.scrollY ?? "0", 10);
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      if (scrollY > 0) window.scrollTo(0, scrollY);
+    }
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+    };
   }, [menuOpen]);
 
   // Cierra el menú al navegar
@@ -46,7 +65,11 @@ export function Header() {
       {/* ── Barra fija ─────────────────────────────────────────── */}
       <header
         className="fixed top-0 left-0 right-0 z-50 overflow-hidden border-b border-brand-primary/20"
-        style={{ background: "#0D0602" }}
+        style={{
+          background: "#0D0602",
+          WebkitTransform: "translateZ(0)",
+          transform: "translateZ(0)",
+        }}
       >
         {/* Capa de fuego — se desvanece al hacer scroll */}
         <div
@@ -54,6 +77,7 @@ export function Header() {
           style={{
             background: "linear-gradient(to right, #C1121F 0%, #E85D04 100%)",
             opacity: scrolled ? 0 : 1,
+            willChange: "opacity",
           }}
         >
           <EmberParticles mini colors={["#FFD700", "#FFED4A", "#FFF176", "#FFB703"]} />
