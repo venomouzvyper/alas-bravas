@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Hito 6 completado y taggeado (`hito-6`) — sitio lanzado
+- **Última sesión:** Menú interactivo — auditoría UX y conversión completa (ver sección abajo)
 
 ---
 
@@ -150,7 +150,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 - `sitemap.xml` y `robots.txt` generados automáticamente por Next.js
 - PWA manifest (`/manifest.webmanifest`) — instalable en home screen
 - Google Analytics: componente listo, se activa con `NEXT_PUBLIC_GA_ID` en Vercel
-- Botón flotante de WhatsApp (+504 3246-2305), oculto en rutas `/admin`
+- Botón flotante de WhatsApp (+504 3246-2305), oculto en rutas `/admin` y `/menu`
 - Footer actualizado: datos reales (La Cabaña, 1–11 PM, Mandaditos) + Instagram `@alasbravas1709`
 - **Fix de LCP crítico:** HeroSection convertido a Server Component con CSS `@keyframes` puros — elimina Framer Motion del hero, LCP bajó de 4.0s a 2.5s, TBT de 160ms a 60ms
 
@@ -198,6 +198,85 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 ### Variables de entorno configuradas
 - Vercel: Production + Preview + Development ✅
 - `.env.local`: configurado localmente ✅ (en `.gitignore`, nunca al repo)
+
+---
+
+## Sesión Menú Interactivo — Auditoría UX y Conversión ✅
+
+**Objetivo:** Convertir el menú de vitrina pasiva a sistema de pedidos interactivo. Auditoría completa de la sección `/menu` con criterio de restaurante app profesional.
+
+### Arquitectura: `MenuOrden` — componente unificado
+
+`MenuPageClient` + `OrderBuilder` fusionados en `components/sections/MenuOrden.tsx`.
+
+**Flujo del cliente:**
+1. Abre `/menu` (vía QR o directo) → ve el grid de tarjetas
+2. Tap en tarjeta → **detail sheet** con info completa + customización
+3. Tap en `+` de la tarjeta → agregar rápido sin abrir detalle
+4. Al agregar ítems → **barra flotante** aparece con llamas y total
+5. Tap en la barra → **drawer de checkout** (resumen + tipo + datos)
+6. CTA "Pedir ahora" → abre WhatsApp con el pedido pre-armado
+
+### Detail sheet (`ItemDetailSheet`)
+- Imagen a todo ancho, nombre sin truncar, descripción completa
+- Acompañamientos como chips con emoji (`🍌 Tajadas`, `🫘 Frijoles fritos`, etc.)
+- Precio tachado + "Ahorrás L.XX" para promos con `precioRegular`
+- Selector de salsa BB / Búfalo con validación (error visual si intentás agregar sin elegir)
+- Cross-sell: 2 ítems complementarios por categoría — tap = abre su detalle, `+` = quick-add
+
+### Cards uniformes
+- Altura fija `h-[290px] sm:h-[340px]` en todos los ítems — sin deformación por contenido
+- Imagen: `h-28 sm:h-36` (regular) / `h-36 sm:h-40` (promos)
+- Burbuja de cantidad: **dorada** (`brand-accent`) cuando falta salsa, **roja** cuando completa
+- Selector de salsa eliminado de la tarjeta — vive en el detail sheet y en el drawer
+
+### Sticky bar con animación de llamas
+- Fondo `#1A0400` con los mismos `glow-left` / `glow-right` del hero (7s, ease-in-out)
+- Texto en `font-display` — es un elemento de marca, no de WhatsApp
+- El verde queda reservado exclusivamente para "Pedir ahora" (acción real de WA)
+
+### Drawer de checkout
+- Resumen del pedido con `−` cantidad `+` por ítem (editar sin salir)
+- **Salsa inline**: si falta elegir, aparecen [BB] [Búfalo] directo en la fila
+- Upsell contextual: tajadas si hay proteínas sin acompañamiento; refresco si no hay bebida; nada si el pedido tiene 5+ ítems
+- Aviso de pago: *"Sin cobro online · pagás al recibir tu pedido"* al pie
+- Campo de teléfono obligatorio para delivery
+
+### Promos por día
+- Tab "Promos ⚡" muestra **solo las promos del día actual** (resto ocultas, no solo dimmed)
+- Estado vacío: mensaje "VOLVÉ EL MIÉRCOLES" cuando no hay promos activas
+- Banner superior dinámico por día:
+  - Mié / Jue → rojo (`brand-primary`), urgencia de hoy
+  - Viernes → rojo, urgencia de hoy
+  - Martes → naranja (`brand-secondary`), "Mañana: 14 alitas por L.300 — ¿volvés?"
+  - Dom / Lun / Sáb → naranja, "El miércoles: 14 alitas por L.300 — ¿lo anotás?"
+
+### Persuasión implementada
+| Técnica | Implementación |
+|---|---|
+| Anclaje de precio | `precioRegular` tachado en promos de viernes (`~~L.320~~` → L.300) |
+| `valorTag` en cards | "AHORRÁS L.20", "1 ALITA GRATIS", "2 ALITAS EXTRA" |
+| Cross-sell contextual | 2 ítems complementarios en el detail sheet |
+| Upsell inteligente | Sugerencia relevante según composición del carrito |
+| Urgencia temporal | Banner rojo en días de promo activa |
+| Anticipación | Banner naranja en días previos a promo |
+| Claridad de proceso | Aviso de pago presencial + aclara el rol de Mandaditos |
+
+### Cambios en tipos y datos (`lib/menu-data.ts`)
+```ts
+interface ItemMenu {
+  // Campos nuevos:
+  valorTag?: string;      // Badge en la card ("AHORRÁS L.20", "1 ALITA GRATIS"...)
+  precioRegular?: number; // Para mostrar precio tachado en el detail sheet
+}
+```
+- `precioRegular: 320` en `promo-viernes-chuleta` y `promo-viernes-carne`
+- `valorTag` en todas las promos
+
+### Otros cambios
+- `WhatsAppButton` oculto en `/menu` (era redundante y se superponía visualmente)
+- Timezone Honduras (`America/Tegucigalpa`) en todos los cálculos de cliente
+- `getBannerData()` computa el banner client-side — independiente del server prop `promoDia`
 
 ---
 
