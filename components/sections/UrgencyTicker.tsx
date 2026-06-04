@@ -11,7 +11,12 @@ const ITEMS = [
   "🛵 PIDE POR MANDADITOS",
 ];
 
-const SPEED_PX_PER_SEC = 80;
+function getSpeed(): number {
+  const w = window.innerWidth;
+  if (w < 640) return 150;
+  if (w < 1024) return 100;
+  return 80;
+}
 
 export function UrgencyTicker() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -21,10 +26,15 @@ export function UrgencyTicker() {
     const el = trackRef.current;
     if (!el) return;
 
-    // Mide el ancho real de UNA copia del contenido (la mitad del track duplicado)
-    const halfWidth = el.scrollWidth / 2;
-    const duration = halfWidth / SPEED_PX_PER_SEC;
-    el.style.animationDuration = `${duration}s`;
+    function updateSpeed() {
+      if (!el) return;
+      const halfWidth = el.scrollWidth / 2;
+      el.style.animationDuration = `${halfWidth / getSpeed()}s`;
+    }
+
+    updateSpeed();
+    window.addEventListener('resize', updateSpeed);
+    return () => window.removeEventListener('resize', updateSpeed);
   }, []);
 
   return (

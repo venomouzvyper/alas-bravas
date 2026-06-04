@@ -99,7 +99,7 @@ export function HeroReveal() {
             />
           </div>
 
-          {/* CTAs */}
+          {/* CTAs primarios */}
           <div
             className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
             style={{ animation: 'reveal-fade-up 0.5s ease 0.6s both' }}
@@ -115,6 +115,27 @@ export function HeroReveal() {
               className="inline-flex items-center justify-center px-10 py-4 rounded-full border-2 border-brand-cream/55 bg-white/5 hover:border-brand-accent hover:bg-white/10 text-brand-cream hover:text-brand-accent font-display text-xl tracking-widest uppercase transition-colors duration-200"
             >
               Reservar
+            </Link>
+          </div>
+
+          {/* CTAs secundarios */}
+          <div
+            className="flex flex-row flex-wrap gap-3 justify-center mt-4"
+            style={{ animation: 'reveal-fade-up 0.5s ease 0.85s both' }}
+          >
+            <a
+              href="https://maps.app.goo.gl/6mF7ZbRwVntGKyQA6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-brand-cream/20 text-brand-cream/55 hover:text-brand-cream hover:border-brand-cream/40 font-display text-sm tracking-widest uppercase transition-colors duration-200"
+            >
+              📍 Cómo Llegar
+            </a>
+            <Link
+              href="/galeria"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-brand-cream/20 text-brand-cream/55 hover:text-brand-cream hover:border-brand-cream/40 font-display text-sm tracking-widest uppercase transition-colors duration-200"
+            >
+              📸 La Galería
             </Link>
           </div>
         </div>
