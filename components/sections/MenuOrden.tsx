@@ -518,7 +518,7 @@ export function MenuOrden({ items, promoDia }: Props) {
               <div className="relative z-10 px-5 pt-3 pb-2 border-b border-white/8">
                 {itemsEnOrden.slice(0, 3).map(({ item, ord }) => (
                   <div key={item.id} className="flex items-center justify-between gap-3 py-0.5">
-                    <span className="text-brand-cream/70 text-xs">{item.nombre}</span>
+                    <span className="text-white text-xs font-medium">{item.nombre}</span>
                     <span className="text-brand-accent text-xs font-bold shrink-0">×{ord.cantidad}</span>
                   </div>
                 ))}
