@@ -75,5 +75,12 @@ CREATE POLICY "configuracion_public_read" ON configuracion
   FOR SELECT USING (true);
 
 INSERT INTO configuracion (clave, valor) VALUES
-  ('mandaditos_telefono', '50489010135')
+  ('mandaditos_telefono',     '50489010135'),
+  ('hora_apertura',           '11:00'),
+  ('hora_cierre',             '00:00'),
+  ('mostrar_precios_bebidas', 'true'),
+  ('compra_bebidas',          'false')
 ON CONFLICT (clave) DO NOTHING;
+
+-- Agregar subcategoria a menu_items (ejecutar si ya existe la tabla)
+-- ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS subcategoria TEXT;

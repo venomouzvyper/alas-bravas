@@ -1,22 +1,33 @@
 import { getSupabase } from '@/lib/supabase';
 import { ConfiguracionAdmin } from './ConfiguracionAdmin';
 
-const MANDADITOS_DEFAULT = '50489010135';
+const DEFAULTS = {
+  mandaditosTel:        '50489010135',
+  horaApertura:         '11:00',
+  horaCierre:           '00:00',
+  mostrarPreciosBebidas: true,
+  compraBebidas:         false,
+};
 
-async function getMandaditosTel(): Promise<string> {
+async function getConfig() {
   const supabase = getSupabase();
-  if (!supabase) return MANDADITOS_DEFAULT;
+  if (!supabase) return DEFAULTS;
 
-  const { data } = await supabase
-    .from('configuracion')
-    .select('valor')
-    .eq('clave', 'mandaditos_telefono')
-    .single();
+  const { data } = await supabase.from('configuracion').select('clave, valor');
+  if (!data) return DEFAULTS;
 
-  return data?.valor ?? MANDADITOS_DEFAULT;
+  const cfg: Record<string, string> = Object.fromEntries(data.map(r => [r.clave, r.valor]));
+
+  return {
+    mandaditosTel:        cfg.mandaditos_telefono   ?? DEFAULTS.mandaditosTel,
+    horaApertura:         cfg.hora_apertura         ?? DEFAULTS.horaApertura,
+    horaCierre:           cfg.hora_cierre           ?? DEFAULTS.horaCierre,
+    mostrarPreciosBebidas: cfg.mostrar_precios_bebidas !== 'false',
+    compraBebidas:        cfg.compra_bebidas === 'true',
+  };
 }
 
 export default async function ConfiguracionPage() {
-  const mandaditosTel = await getMandaditosTel();
-  return <ConfiguracionAdmin mandaditosTel={mandaditosTel} />;
+  const config = await getConfig();
+  return <ConfiguracionAdmin {...config} />;
 }

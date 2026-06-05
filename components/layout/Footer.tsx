@@ -82,7 +82,7 @@ export function Footer() {
                 <span className="text-lg leading-none mt-0.5">🕐</span>
                 <div className="text-sm text-brand-cream/60 leading-snug">
                   <span className="block">Lun – Dom</span>
-                  <span className="text-brand-cream/80 font-semibold">1:00 PM – 11:00 PM</span>
+                  <span className="text-brand-cream/80 font-semibold">11:00 AM – 12:00 AM</span>
                 </div>
               </div>
 

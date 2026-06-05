@@ -36,39 +36,45 @@ const ACOMP_EMOJI: Record<string, string> = {
 };
 
 const CROSS_SELL: Record<string, string[]> = {
-  alitas:  ["tajadas-preparadas", "refresco"],
-  carnes:  ["tajadas-preparadas", "refresco"],
-  tajadas: ["alitas-6", "refresco"],
-  pupusas: ["refresco", "alitas-6"],
+  alitas:  ["tajadas-preparadas", "beb-portatil"],
+  carnes:  ["tajadas-preparadas", "beb-portatil"],
+  tajadas: ["alitas-6", "beb-portatil"],
+  pupusas: ["beb-portatil", "alitas-6"],
   bebidas: ["alitas-6", "carne-cerdo-chorizo"],
-  promos:  ["tajadas-preparadas", "refresco"],
+  promos:  ["tajadas-preparadas", "beb-portatil"],
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────
 function getHondurasTime() {
   return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Tegucigalpa" }));
 }
-function estaAbierto(): boolean {
-  const h = getHondurasTime().getHours();
-  return h >= 13 && h < 23;
+function estaAbierto(horaApertura: string, horaCierre: string): boolean {
+  const now = getHondurasTime();
+  const currentMin = now.getHours() * 60 + now.getMinutes();
+  const [aH, aM] = horaApertura.split(":").map(Number);
+  const aperturaMin = aH * 60 + (aM || 0);
+  const [cH, cM] = horaCierre.split(":").map(Number);
+  const cierreMin = cH === 0 && cM === 0 ? 24 * 60 : cH * 60 + (cM || 0);
+  return currentMin >= aperturaMin && currentMin < cierreMin;
 }
 function isDisponible(item: ItemMenu): boolean {
   if (!item.dia) return true;
   const d = getHondurasTime().getDay();
   if (item.dia.includes("Mié") && (d === 3 || d === 4)) return true;
+  if (item.dia.includes("Dom") && d === 0) return true;
   if (item.dia === "Viernes" && d === 5) return true;
   return false;
 }
 function necesitaSabor(item: ItemMenu): boolean {
   return item.categoria === "alitas" || item.nombre.toLowerCase().includes("alitas");
 }
-function getCrossSell(item: ItemMenu, items: ItemMenu[]): ItemMenu[] {
+function getCrossSell(item: ItemMenu, items: ItemMenu[], compraBebidas: boolean): ItemMenu[] {
   return (CROSS_SELL[item.categoria] ?? [])
     .filter(id => id !== item.id)
     .map(id => items.find(i => i.id === id))
-    .filter((i): i is ItemMenu => !!i && isDisponible(i));
+    .filter((i): i is ItemMenu => !!i && isDisponible(i) && (compraBebidas || i.categoria !== "bebidas"));
 }
-function getUpsell(orden: Record<string, ItemOrden>, items: ItemMenu[]): { item: ItemMenu; label: string } | null {
+function getUpsell(orden: Record<string, ItemOrden>, items: ItemMenu[], compraBebidas: boolean): { item: ItemMenu; label: string } | null {
   const activos = items.filter(i => (orden[i.id]?.cantidad ?? 0) > 0);
   if (!activos.length) return null;
   const totalCant = activos.reduce((s, i) => s + (orden[i.id]?.cantidad ?? 0), 0);
@@ -77,12 +83,12 @@ function getUpsell(orden: Record<string, ItemOrden>, items: ItemMenu[]): { item:
   const tieneBebida   = cats.has("bebidas");
   const tieneTajadas  = (orden["tajadas-preparadas"]?.cantidad ?? 0) > 0;
   const tieneProteina = cats.has("alitas") || cats.has("carnes") || activos.some(i => i.nombre.toLowerCase().includes("alitas"));
-  if (tieneProteina && !tieneTajadas && !tieneBebida) {
+  if (tieneProteina && !tieneTajadas) {
     const tajadas = items.find(i => i.id === "tajadas-preparadas");
     if (tajadas) return { item: tajadas, label: "¿Algo para acompañar?" };
   }
-  if (!tieneBebida) {
-    const refresco = items.find(i => i.id === "refresco");
+  if (!tieneBebida && compraBebidas) {
+    const refresco = items.find(i => i.id === "beb-portatil");
     if (refresco) return { item: refresco, label: "¿Querés un refresco?" };
   }
   return null;
@@ -91,7 +97,16 @@ function getBannerData(): BannerData | null {
   const d = getHondurasTime().getDay();
   if (d === 3 || d === 4) return {
     titulo: "🔥 HOY ES DÍA DE ALITAS",
-    sub: "Solo miércoles y jueves · ¡Aprovechá!",
+    sub: "Solo miércoles, jueves y domingos · ¡Aprovechá!",
+    tipo: "hoy",
+    ofertas: [
+      { label: "14 ALITAS BB O BÚFALO", precio: "L.300" },
+      { label: "7 ALITAS BB O BÚFALO",  precio: "L.180" },
+    ],
+  };
+  if (d === 0) return {
+    titulo: "🔥 DOMINGO DE ALITAS",
+    sub: "Promo especial de domingos · ¡Solo hoy!",
     tipo: "hoy",
     ofertas: [
       { label: "14 ALITAS BB O BÚFALO", precio: "L.300" },
@@ -104,8 +119,9 @@ function getBannerData(): BannerData | null {
     tipo: "hoy",
     ofertas: [{ label: "2 PLATOS A ELEGIR", precio: "L.300" }],
   };
-  if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié y jue · Trae a tus amigos", tipo: "prox" };
-  return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos todos los mié, jue y viernes", tipo: "prox" };
+  if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié, jue y dom · Trae a tus amigos", tipo: "prox" };
+  if (d === 6) return { titulo: "🔥 Mañana: domingo de alitas por L.300 — ¡anotalo!", sub: "Promo especial todos los domingos", tipo: "prox" };
+  return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos mié, jue, vie y domingos", tipo: "prox" };
 }
 type WaMsgBase = {
   nombre: string; notas: string;
@@ -298,14 +314,14 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
 }
 
 // ── ItemDetailSheet ───────────────────────────────────────────────────
-function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgregar, onClose, onOpenDetalle, onQuickAdd }: {
+function ItemDetailSheet({ item, items, local, saborError, compraBebidas, onLocalChange, onAgregar, onClose, onOpenDetalle, onQuickAdd }: {
   item: ItemMenu; items: ItemMenu[];
-  local: { cantidad: number; sabor?: Sabor }; saborError: boolean;
+  local: { cantidad: number; sabor?: Sabor }; saborError: boolean; compraBebidas: boolean;
   onLocalChange: (l: { cantidad: number; sabor?: Sabor }) => void;
   onAgregar: () => void; onClose: () => void;
   onOpenDetalle: (item: ItemMenu) => void; onQuickAdd: (item: ItemMenu) => void;
 }) {
-  const crossSell = getCrossSell(item, items);
+  const crossSell = getCrossSell(item, items, compraBebidas);
 
   return (
     <>
@@ -423,10 +439,86 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
   );
 }
 
-// ── Componente principal ──────────────────────────────────────────────
-interface Props { items: ItemMenu[]; promoDia: PromoDia; mandaditosTel: string; }
+// ── BebidaLista ───────────────────────────────────────────────────────
+function BebidaGrupo({ titulo, emoji, items, mostrarPrecios, compraBebidas, orden, onCambiar }: {
+  titulo: string; emoji: string; items: ItemMenu[];
+  mostrarPrecios: boolean; compraBebidas: boolean;
+  orden: Record<string, ItemOrden>; onCambiar: (id: string, d: number) => void;
+}) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-lg">{emoji}</span>
+        <p className="text-brand-cream/50 text-[10px] font-bold uppercase tracking-widest">{titulo}</p>
+        <div className="flex-1 h-px bg-white/8" />
+      </div>
+      <div className="rounded-xl border border-white/8 overflow-hidden">
+        {items.map((item, i) => {
+          const cantidad = orden[item.id]?.cantidad ?? 0;
+          return (
+            <div key={item.id}
+              className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                i < items.length - 1 ? "border-b border-white/5" : ""
+              } ${cantidad > 0 ? "bg-brand-primary/8" : ""}`}>
+              <span className="text-xl shrink-0">{item.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-brand-cream/85 text-sm font-medium leading-tight">{item.nombre}</p>
+                <p className="text-brand-cream/35 text-xs mt-0.5 truncate">{item.descripcion}</p>
+              </div>
+              {mostrarPrecios && (
+                <p className="font-display text-brand-accent text-lg tracking-wider shrink-0 tabular-nums">L.{item.precio}</p>
+              )}
+              {compraBebidas && (
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {cantidad > 0 ? (
+                    <>
+                      <button onClick={() => onCambiar(item.id, -1)} aria-label="Reducir"
+                        className="w-7 h-7 rounded-full bg-brand-gray-800 hover:bg-brand-gray-700 text-brand-cream text-sm font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center">−</button>
+                      <span className="w-5 text-center font-bold text-sm text-brand-cream tabular-nums">{cantidad}</span>
+                      <button onClick={() => onCambiar(item.id, 1)} aria-label="Agregar"
+                        className="w-7 h-7 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-sm font-bold transition-all active:scale-90 cursor-pointer flex items-center justify-center">+</button>
+                    </>
+                  ) : (
+                    <button onClick={() => onCambiar(item.id, 1)} aria-label={`Agregar ${item.nombre}`}
+                      className="btn-breathe w-9 h-9 rounded-full bg-brand-primary hover:bg-red-700 text-brand-cream text-xl font-bold transition-colors active:scale-90 cursor-pointer flex items-center justify-center">+</button>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-export function MenuOrden({ items, promoDia, mandaditosTel }: Props) {
+function BebidaLista({ items, mostrarPrecios, compraBebidas, orden, onCambiar }: {
+  items: ItemMenu[]; mostrarPrecios: boolean; compraBebidas: boolean;
+  orden: Record<string, ItemOrden>; onCambiar: (id: string, d: number) => void;
+}) {
+  const refrescos = items.filter(i => i.subcategoria === "refrescos");
+  const cervezas  = items.filter(i => i.subcategoria === "cervezas");
+  return (
+    <div className="space-y-6">
+      <BebidaGrupo titulo="Refrescos y bebidas" emoji="🥤"
+        items={refrescos} mostrarPrecios={mostrarPrecios} compraBebidas={compraBebidas}
+        orden={orden} onCambiar={onCambiar} />
+      <BebidaGrupo titulo="Cervezas" emoji="🍺"
+        items={cervezas} mostrarPrecios={mostrarPrecios} compraBebidas={compraBebidas}
+        orden={orden} onCambiar={onCambiar} />
+    </div>
+  );
+}
+
+// ── Componente principal ──────────────────────────────────────────────
+interface Props {
+  items: ItemMenu[]; promoDia: PromoDia; mandaditosTel: string;
+  horaApertura: string; horaCierre: string;
+  mostrarPreciosBebidas: boolean; compraBebidas: boolean;
+}
+
+export function MenuOrden({ items, promoDia, mandaditosTel, horaApertura, horaCierre, mostrarPreciosBebidas, compraBebidas }: Props) {
   const defaultCat: Categoria | "todos" = promoDia ? "promos" : "alitas";
   const [categoriaActiva, setCategoriaActiva] = useState<Categoria | "todos">(defaultCat);
   const [orden, setOrden] = useState<Record<string, ItemOrden>>({});
@@ -447,7 +539,7 @@ export function MenuOrden({ items, promoDia, mandaditosTel }: Props) {
   const [paso, setPaso]             = useState<1 | 2 | 3>(1);
   const [direction, setDirection]   = useState(1);
 
-  const abierto     = estaAbierto();
+  const abierto     = estaAbierto(horaApertura, horaCierre);
   const bannerData  = useMemo(() => getBannerData(), []);
 
   useEffect(() => {
@@ -475,7 +567,7 @@ export function MenuOrden({ items, promoDia, mandaditosTel }: Props) {
     return { total, itemCount, sinSabor };
   }, [orden, items]);
 
-  const upsell = useMemo(() => getUpsell(orden, items), [orden, items]);
+  const upsell = useMemo(() => getUpsell(orden, items, compraBebidas), [orden, items, compraBebidas]);
   const itemsEnOrden = useMemo(() =>
     Object.entries(orden)
       .filter(([, ord]) => ord.cantidad > 0)
@@ -636,31 +728,41 @@ export function MenuOrden({ items, promoDia, mandaditosTel }: Props) {
           </div>
         </div>
 
-        {/* Grid */}
-        <motion.div layout className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <AnimatePresence mode="popLayout">
-            {itemsFiltrados.length > 0 ? itemsFiltrados.map(item => (
-              <motion.div key={item.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2 }}
-                className={item.categoria === "promos" ? "col-span-2 sm:col-span-1" : ""}>
-                <MenuCard
-                  item={item}
-                  cantidad={orden[item.id]?.cantidad ?? 0}
-                  sabor={orden[item.id]?.sabor}
-                  disponible={isDisponible(item)}
-                  onTap={() => abrirDetalle(item)}
-                  onCambiar={d => cambiarCantidad(item.id, d)}
-                  onSabor={s => cambiarSabor(item.id, s)}
-                />
-              </motion.div>
-            )) : categoriaActiva === "promos" ? (
-              <motion.div key="empty-promos" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-2 lg:col-span-3 py-16 text-center">
-                <p className="text-5xl mb-4">🔥</p>
-                <p className="font-display text-2xl text-brand-cream tracking-wider">VOLVÉ EL MIÉRCOLES</p>
-                <p className="text-brand-cream/40 text-sm mt-2">Promos especiales los mié, jue y viernes</p>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </motion.div>
+        {/* Grid / Lista */}
+        {categoriaActiva === "bebidas" ? (
+          <BebidaLista
+            items={itemsFiltrados}
+            mostrarPrecios={mostrarPreciosBebidas}
+            compraBebidas={compraBebidas}
+            orden={orden}
+            onCambiar={cambiarCantidad}
+          />
+        ) : (
+          <motion.div layout className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <AnimatePresence mode="popLayout">
+              {itemsFiltrados.length > 0 ? itemsFiltrados.map(item => (
+                <motion.div key={item.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2 }}
+                  className={item.categoria === "promos" ? "col-span-2 sm:col-span-1" : ""}>
+                  <MenuCard
+                    item={item}
+                    cantidad={orden[item.id]?.cantidad ?? 0}
+                    sabor={orden[item.id]?.sabor}
+                    disponible={isDisponible(item)}
+                    onTap={() => abrirDetalle(item)}
+                    onCambiar={d => cambiarCantidad(item.id, d)}
+                    onSabor={s => cambiarSabor(item.id, s)}
+                  />
+                </motion.div>
+              )) : categoriaActiva === "promos" ? (
+                <motion.div key="empty-promos" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-2 lg:col-span-3 py-16 text-center">
+                  <p className="text-5xl mb-4">🔥</p>
+                  <p className="font-display text-2xl text-brand-cream tracking-wider">VOLVÉ EL MIÉRCOLES</p>
+                  <p className="text-brand-cream/40 text-sm mt-2">Promos especiales los mié, jue, dom y viernes</p>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </motion.div>
+        )}
       </div>
 
       {/* Barra flotante */}
@@ -922,6 +1024,7 @@ export function MenuOrden({ items, promoDia, mandaditosTel }: Props) {
         {detalleItem && (
           <ItemDetailSheet
             item={detalleItem} items={items} local={detalleLocal} saborError={saborError}
+            compraBebidas={compraBebidas}
             onLocalChange={l => { setDetalleLocal(l); setSaborError(false); }}
             onAgregar={aplicarDetalle}
             onClose={() => setDetalleItem(null)}

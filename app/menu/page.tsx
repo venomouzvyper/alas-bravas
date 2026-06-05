@@ -15,20 +15,18 @@ export const metadata: Metadata = {
   },
 };
 
-export type PromoDia = "mie-jue" | "viernes" | null;
+export type PromoDia = "mie-jue" | "dom" | "viernes" | null;
 
 function getPromoDia(): PromoDia {
-  // Convertir a zona horaria de Honduras (UTC-6)
   const ahora = new Date(
     new Date().toLocaleString("en-US", { timeZone: "America/Tegucigalpa" })
   );
-  const dia = ahora.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+  const dia = ahora.getDay();
   if (dia === 3 || dia === 4) return "mie-jue";
+  if (dia === 0) return "dom";
   if (dia === 5) return "viernes";
   return null;
 }
-
-const MANDADITOS_DEFAULT = "50489010135";
 
 async function fetchMenuItems(): Promise<ItemMenu[]> {
   const supabase = getSupabase();
@@ -44,31 +42,57 @@ async function fetchMenuItems(): Promise<ItemMenu[]> {
   return data as ItemMenu[];
 }
 
-async function fetchMandaditosTel(): Promise<string> {
+interface Config {
+  mandaditosTel: string;
+  horaApertura: string;
+  horaCierre: string;
+  mostrarPreciosBebidas: boolean;
+  compraBebidas: boolean;
+}
+
+async function fetchConfig(): Promise<Config> {
+  const defaults: Config = {
+    mandaditosTel: "50489010135",
+    horaApertura: "11:00",
+    horaCierre: "00:00",
+    mostrarPreciosBebidas: true,
+    compraBebidas: false,
+  };
+
   const supabase = getSupabase();
-  if (!supabase) return MANDADITOS_DEFAULT;
+  if (!supabase) return defaults;
 
-  const { data } = await supabase
-    .from("configuracion")
-    .select("valor")
-    .eq("clave", "mandaditos_telefono")
-    .single();
+  const { data } = await supabase.from("configuracion").select("clave, valor");
+  if (!data) return defaults;
 
-  return data?.valor ?? MANDADITOS_DEFAULT;
+  const cfg: Record<string, string> = Object.fromEntries(data.map(r => [r.clave, r.valor]));
+
+  return {
+    mandaditosTel:        cfg.mandaditos_telefono ?? defaults.mandaditosTel,
+    horaApertura:         cfg.hora_apertura       ?? defaults.horaApertura,
+    horaCierre:           cfg.hora_cierre         ?? defaults.horaCierre,
+    mostrarPreciosBebidas: cfg.mostrar_precios_bebidas !== "false",
+    compraBebidas:        cfg.compra_bebidas === "true",
+  };
 }
 
 export default async function MenuPage() {
-  const [items, mandaditosTel] = await Promise.all([
-    fetchMenuItems(),
-    fetchMandaditosTel(),
-  ]);
+  const [items, config] = await Promise.all([fetchMenuItems(), fetchConfig()]);
   const promoDia = getPromoDia();
 
   return (
     <>
       <Header />
       <main className="pt-16 pb-44">
-        <MenuOrden items={items} promoDia={promoDia} mandaditosTel={mandaditosTel} />
+        <MenuOrden
+          items={items}
+          promoDia={promoDia}
+          mandaditosTel={config.mandaditosTel}
+          horaApertura={config.horaApertura}
+          horaCierre={config.horaCierre}
+          mostrarPreciosBebidas={config.mostrarPreciosBebidas}
+          compraBebidas={config.compraBebidas}
+        />
       </main>
       <Footer />
     </>
