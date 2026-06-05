@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Fix responsiveness mobile — GPU compositing e iOS scroll lock (ver sección abajo)
+- **Última sesión:** Menú definitivo, Ruta C Mandaditos, configuración dinámica desde admin (ver sección abajo)
 
 ---
 
@@ -426,6 +426,86 @@ La opción "Comer aquí" fue eliminada del drawer de checkout. El flujo de reser
 - Tab activo: `bg-brand-primary` + `boxShadow: 0 0 12px 3px rgba(193,18,31,0.45)` glow rojo
 - Fade gradient en borde derecho `w-10` — indica scroll horizontal disponible
 - `lib/menu-data.ts`: label de promos limpiado de "⚡" (el ícono viene de `CAT_ICONS`)
+
+---
+
+## Sesión Menú Definitivo, Ruta C y Configuración Dinámica ✅
+
+**Objetivo:** Implementar el menú completo real del restaurante, redirigir delivery a Mandaditos (Ruta C) y hacer el sistema configurable desde el panel admin sin tocar código.
+
+### Ruta C — Delivery vía Mandaditos
+
+El botón "Pedir ahora" ahora bifurca según el tipo de orden:
+- **Para recoger** → WhatsApp directo al restaurante (`+50432462305`)
+- **Delivery** → WhatsApp a Mandaditos con el pedido pre-armado, mencionando explícitamente "Alas Bravas (La Cabaña, San Lorenzo)"
+
+El número de Mandaditos actual es `+50489010135`. El mensaje para Mandaditos incluye: ítems, subtotal, dirección, teléfono y nombre del cliente.
+
+**Razón de la bifurcación:** El restaurante no tiene moto propia. Mandaditos opera con call center; el flujo establecido es cliente → Mandaditos → restaurante. La web respeta ese flujo en lugar de crear un canal paralelo que el restaurante no puede operar.
+
+### Tabla `configuracion` en Supabase
+
+Nueva tabla para ajustes dinámicos que el admin puede cambiar sin deploy:
+
+| Clave | Valor por defecto | Descripción |
+|---|---|---|
+| `mandaditos_telefono` | `50489010135` | Destino del WhatsApp de delivery |
+| `hora_apertura` | `11:00` | Hora de apertura (HH:MM) |
+| `hora_cierre` | `00:00` | Hora de cierre — `00:00` = medianoche |
+| `mostrar_precios_bebidas` | `true` | Oculta/muestra precios en la sección de bebidas |
+| `compra_bebidas` | `false` | Habilita agregar bebidas al pedido de WhatsApp |
+
+RLS: SELECT público (menú lo lee con anon key), escritura solo vía service role.
+
+### Admin → Configuración (`/admin/configuracion`)
+
+Página con cuatro bloques:
+1. **Número de Mandaditos** — input con validación de número hondureño (8 dígitos, empieza en 3/7/8/9)
+2. **Horario del restaurante** — dos `<input type="time">` (apertura + cierre), guarda en `configuracion`
+3. **Días activos** — UI lista (checkboxes deshabilitados), conectar cuando se definan los días
+4. **Bebidas** — dos toggles con auto-save: mostrar precios / habilitar compra
+
+### Menú completo — 32 ítems en Supabase
+
+| Categoría | Ítems |
+|---|---|
+| Alitas | 6 Alitas (L.180), 12 Alitas (L.320) |
+| Carnes | Carne Asada de Cerdo, Chuleta Asada de Cerdo, Chuleta con Chorizo, Carne de Cerdo con Chorizo (todas L.160) |
+| Tajadas | 1 Orden (L.90), 2 Órdenes (L.170, `AHORRÁS L.10`) |
+| Pupusas | Quesillo (L.100), Chicharrón (L.110) — Mié/Jue, `🍪 GALLETA GRATIS` |
+| Bebidas refrescos | 12 ítems: Portátil L.30 → Botella Agua L.13 |
+| Bebidas cervezas | 6 ítems: Corona L.55 → Barena L.30 |
+| Promos | 14 Alitas L.300, 7 Alitas L.180 (Mié/Jue/Dom); 2 Platos Carne Asada L.300, 2 Platos Chuleta Asada L.300 (Viernes) |
+
+**Columnas nuevas en `menu_items`:** `subcategoria TEXT` (para `refrescos`/`cervezas`), `destacado BOOLEAN`, `valor_tag TEXT`, `precio_regular INTEGER`, `image_url TEXT`.
+
+### Bebidas — lista de precios, no cards
+
+Cuando `categoriaActiva === "bebidas"`, el grid de cards es reemplazado por `BebidaLista`: dos grupos (`BebidaGrupo`) apilados con separador — Refrescos y Cervezas. Cada ítem muestra emoji + nombre + descripción + precio (si `mostrarPreciosBebidas`) + stepper (si `compraBebidas`).
+
+### Promos de domingo
+
+`isDisponible()` actualizado: `item.dia.includes("Dom") && d === 0`. `getBannerData()` muestra banner rojo en domingo y anticipación el sábado. `PromoDia` incluye `"dom"`.
+
+### Horario configurable
+
+`estaAbierto(horaApertura, horaCierre)` recibe los strings del servidor en lugar de valores hardcodeados. Manejo especial de medianoche: `hora_cierre = "00:00"` se interpreta como 24:00 (fin del día). Horario actual: **11:00 AM – 12:00 AM**.
+
+### Fix snake_case → camelCase
+
+Supabase devuelve campos en `snake_case` (`gradient_from`, `valor_tag`, `precio_regular`). `fetchMenuItems()` ahora mapea explícitamente a los campos camelCase que usa `ItemMenu`. Sin este fix, badges y gradientes de DB eran ignorados.
+
+### `/menu` forzado a renderizado dinámico
+
+`export const dynamic = "force-dynamic"` en `app/menu/page.tsx`. El build muestra `ƒ` en lugar de `○`. Necesario porque sin esto Next.js sirve una versión cacheada al momento del build — los cambios en Supabase no se reflejan hasta el próximo deploy.
+
+### Archivos clave de esta sesión
+- `lib/menu-data.ts` — menú completo con tipo `Subcategoria`
+- `components/sections/MenuOrden.tsx` — `BebidaLista`, `BebidaGrupo`, `estaAbierto()` dinámica, `buildWaMsgMandaditos()`
+- `app/menu/page.tsx` — `fetchConfig()` unificado, mapeo snake→camelCase, `force-dynamic`
+- `app/admin/configuracion/ConfiguracionAdmin.tsx` — 4 secciones de config
+- `app/api/admin/configuracion/route.ts` — PATCH genérico por clave/valor
+- `supabase/schema.sql` — tabla `configuracion` + columnas nuevas en `menu_items`
 
 ---
 
