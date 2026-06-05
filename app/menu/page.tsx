@@ -28,6 +28,8 @@ function getPromoDia(): PromoDia {
   return null;
 }
 
+const MANDADITOS_DEFAULT = "50489010135";
+
 async function fetchMenuItems(): Promise<ItemMenu[]> {
   const supabase = getSupabase();
   if (!supabase) return MENU_ITEMS;
@@ -42,17 +44,31 @@ async function fetchMenuItems(): Promise<ItemMenu[]> {
   return data as ItemMenu[];
 }
 
+async function fetchMandaditosTel(): Promise<string> {
+  const supabase = getSupabase();
+  if (!supabase) return MANDADITOS_DEFAULT;
+
+  const { data } = await supabase
+    .from("configuracion")
+    .select("valor")
+    .eq("clave", "mandaditos_telefono")
+    .single();
+
+  return data?.valor ?? MANDADITOS_DEFAULT;
+}
+
 export default async function MenuPage() {
-  const [items, promoDia] = await Promise.all([
+  const [items, mandaditosTel] = await Promise.all([
     fetchMenuItems(),
-    Promise.resolve(getPromoDia()),
+    fetchMandaditosTel(),
   ]);
+  const promoDia = getPromoDia();
 
   return (
     <>
       <Header />
       <main className="pt-16 pb-44">
-        <MenuOrden items={items} promoDia={promoDia} />
+        <MenuOrden items={items} promoDia={promoDia} mandaditosTel={mandaditosTel} />
       </main>
       <Footer />
     </>

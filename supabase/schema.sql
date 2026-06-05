@@ -60,3 +60,20 @@ INSERT INTO menu_items (categoria, nombre, descripcion, precio, acompanamientos,
   ('promos',   '2 Platos: Carne de Cerdo con Chorizo', 'Dos platos de carne de cerdo + chorizo. Solo los viernes.', 300, ARRAY['Tajadas','Frijoles fritos','Encurtido','Aderezos'], 'Viernes', NULL, '🎉', '#1A0600', '#7A1F00', 10),
   ('promos',   '14 Alitas BB o Búfalo',            'La promo del miércoles y jueves para compartir.',             300,  ARRAY['Papas','Kétchup','Aderezo de la casa'],           'Mié / Jue', 'medium', '🔥', '#200800', '#C1121F', 11),
   ('promos',   '7 Alitas BB o Búfalo',             'Promo personal de miércoles y jueves.',                       180,  ARRAY['Papas','Kétchup','Aderezo de la casa'],           'Mié / Jue', 'medium', '🔥', '#1A0600', '#E85D04', 12);
+
+-- ============================================================
+-- 3. Tabla de configuración general
+-- ============================================================
+CREATE TABLE IF NOT EXISTS configuracion (
+  clave       TEXT PRIMARY KEY,
+  valor       TEXT NOT NULL,
+  updated_at  TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE configuracion ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "configuracion_public_read" ON configuracion
+  FOR SELECT USING (true);
+
+INSERT INTO configuracion (clave, valor) VALUES
+  ('mandaditos_telefono', '50489010135')
+ON CONFLICT (clave) DO NOTHING;

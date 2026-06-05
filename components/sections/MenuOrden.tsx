@@ -107,33 +107,54 @@ function getBannerData(): BannerData | null {
   if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié y jue · Trae a tus amigos", tipo: "prox" };
   return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos todos los mié, jue y viernes", tipo: "prox" };
 }
-function buildWaMsg(p: {
-  tipo: TipoOrden; nombre: string; telefono: string; direccion: string;
-  referencia: string; notas: string;
+type WaMsgBase = {
+  nombre: string; notas: string;
   orden: Record<string, ItemOrden>; items: ItemMenu[]; total: number;
-}): string {
-  const enc: Record<TipoOrden, string> = {
-    delivery: `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar con DELIVERY (vía Mandaditos):`,
-    recoger:  `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar PARA RECOGER:`,
-  };
-  const lineas: string[] = [enc[p.tipo], ""];
-  p.items.forEach(item => {
-    const ord = p.orden[item.id];
+};
+
+function buildItemLineas({ orden, items }: WaMsgBase): string[] {
+  const lineas: string[] = [];
+  items.forEach(item => {
+    const ord = orden[item.id];
     if (!ord?.cantidad) return;
     const sabor  = necesitaSabor(item) && ord.sabor ? ` ${ord.sabor}` : "";
     const pref   = ord.cantidad > 1 ? `${ord.cantidad}x ` : "";
     const precio = ord.cantidad > 1 ? `L.${item.precio} c/u` : `L.${item.precio}`;
     lineas.push(`• ${pref}${item.nombre}${sabor} (${precio})`);
   });
-  lineas.push("", `Subtotal: L.${p.total} 🍗`);
-  if (p.tipo === "delivery") {
-    lineas.push("(+ costo de delivery de Mandaditos según tu distancia)");
-    lineas.push("", `📍 Dirección: ${p.direccion}`);
-    if (p.referencia.trim()) lineas.push(`   Referencia: ${p.referencia}`);
-    lineas.push(`📞 Tel: ${p.telefono}`);
-  }
+  return lineas;
+}
+
+function buildWaMsgRecoger(p: WaMsgBase): string {
+  const lineas = [
+    `Hola 👋 Mi nombre es ${p.nombre}. Quisiera ordenar PARA RECOGER:`,
+    "",
+    ...buildItemLineas(p),
+    "",
+    `Subtotal: L.${p.total} 🍗`,
+  ];
   if (p.notas.trim()) lineas.push(`📝 Nota: ${p.notas.trim()}`);
   return `https://wa.me/50432462305?text=${encodeURIComponent(lineas.join("\n"))}`;
+}
+
+function buildWaMsgMandaditos(p: WaMsgBase & {
+  telefono: string; direccion: string; referencia: string; mandaditosTel: string;
+}): string {
+  const lineas = [
+    `Hola 👋 Quisiera pedir a *Alas Bravas* (La Cabaña, San Lorenzo):`,
+    "",
+    ...buildItemLineas(p),
+    "",
+    `Subtotal: L.${p.total} 🍗`,
+    `(+ costo de delivery según distancia)`,
+    "",
+    `📍 Dirección: ${p.direccion}`,
+  ];
+  if (p.referencia.trim()) lineas.push(`   Referencia: ${p.referencia}`);
+  lineas.push(`📞 Tel: ${p.telefono}`);
+  lineas.push(`👤 Nombre: ${p.nombre}`);
+  if (p.notas.trim()) lineas.push(`📝 Nota: ${p.notas.trim()}`);
+  return `https://wa.me/${p.mandaditosTel}?text=${encodeURIComponent(lineas.join("\n"))}`;
 }
 
 // ── Iconos ────────────────────────────────────────────────────────────
@@ -403,9 +424,9 @@ function ItemDetailSheet({ item, items, local, saborError, onLocalChange, onAgre
 }
 
 // ── Componente principal ──────────────────────────────────────────────
-interface Props { items: ItemMenu[]; promoDia: PromoDia; }
+interface Props { items: ItemMenu[]; promoDia: PromoDia; mandaditosTel: string; }
 
-export function MenuOrden({ items, promoDia }: Props) {
+export function MenuOrden({ items, promoDia, mandaditosTel }: Props) {
   const defaultCat: Categoria | "todos" = promoDia ? "promos" : "alitas";
   const [categoriaActiva, setCategoriaActiva] = useState<Categoria | "todos">(defaultCat);
   const [orden, setOrden] = useState<Record<string, ItemOrden>>({});
@@ -521,7 +542,9 @@ export function MenuOrden({ items, promoDia }: Props) {
     null;
 
   const waLink = puedeEnviar
-    ? buildWaMsg({ tipo: tipo!, nombre, telefono, direccion, referencia, notas, orden, items, total })
+    ? tipo === "delivery"
+      ? buildWaMsgMandaditos({ nombre, telefono, direccion, referencia, notas, orden, items, total, mandaditosTel })
+      : buildWaMsgRecoger({ nombre, notas, orden, items, total })
     : "#";
 
   return (
@@ -870,7 +893,11 @@ export function MenuOrden({ items, promoDia }: Props) {
                           <a href={waLink} target="_blank" rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-white transition-all hover:opacity-90 active:scale-95"
                             style={{ background: "#25D366", boxShadow: "0 0 24px rgba(37,211,102,0.35)" }}>
-                            <WaIcon />{abierto ? `Pedir ahora · L.${total}` : `Pre-ordenar · L.${total}`}
+                            <WaIcon />{
+                              tipo === "delivery"
+                                ? `Pedir con Mandaditos · L.${total}`
+                                : abierto ? `Pedir ahora · L.${total}` : `Pre-ordenar · L.${total}`
+                            }
                           </a>
                         ) : (
                           <button disabled className="w-full py-4 rounded-2xl font-bold text-sm tracking-wider uppercase text-brand-cream/30 bg-brand-gray-800 cursor-not-allowed">

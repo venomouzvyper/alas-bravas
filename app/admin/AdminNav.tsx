@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/admin/reservaciones', label: 'Reservaciones' },
   { href: '/admin/menu', label: 'Menú' },
   { href: '/admin/galeria', label: 'Galería' },
+  { href: '/admin/configuracion', label: 'Configuración' },
 ];
 
 export function AdminNav() {
