@@ -39,7 +39,15 @@ async function fetchMenuItems(): Promise<ItemMenu[]> {
     .order("orden");
 
   if (error || !data || data.length === 0) return MENU_ITEMS;
-  return data as ItemMenu[];
+
+  // Supabase devuelve snake_case — mapeamos a camelCase para ItemMenu
+  return data.map(row => ({
+    ...row,
+    gradientFrom:  row.gradient_from,
+    gradientTo:    row.gradient_to,
+    valorTag:      row.valor_tag      ?? undefined,
+    precioRegular: row.precio_regular ?? undefined,
+  })) as ItemMenu[];
 }
 
 interface Config {
