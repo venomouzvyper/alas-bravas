@@ -5,6 +5,9 @@ import { MenuOrden } from "@/components/sections/MenuOrden";
 import { getSupabase } from "@/lib/supabase";
 import { MENU_ITEMS, type ItemMenu } from "@/lib/menu-data";
 
+// Siempre renderizar desde el servidor — nunca servir versión cacheada
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Menú",
   description: "Alitas BB o Búfalo, carnes, tajadas, pupusas y promos especiales. Alas Bravas, La Cabaña, San Lorenzo.",
