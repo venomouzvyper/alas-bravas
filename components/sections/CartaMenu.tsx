@@ -7,12 +7,12 @@ import type { ItemMenu } from '@/lib/menu-data';
 // ── Secciones ─────────────────────────────────────────────────────
 
 const SECCIONES = [
+  { id: 'promos',  icon: '⚡', label: 'Promos',  tema: 'oro'    as const },
   { id: 'alitas',  icon: '🍗', label: 'Alitas',  tema: 'fuego'  as const },
   { id: 'carnes',  icon: '🥩', label: 'Carnes',  tema: 'brasa'  as const },
   { id: 'tajadas', icon: '🍌', label: 'Tajadas', tema: 'tierra' as const },
   { id: 'pupusas', icon: '🫓', label: 'Pupusas', tema: 'tierra' as const },
   { id: 'bebidas', icon: '❄️', label: 'Bebidas', tema: 'hielo'  as const },
-  { id: 'promos',  icon: '⚡', label: 'Promos',  tema: 'oro'    as const },
 ];
 
 type Tema = 'fuego' | 'brasa' | 'tierra' | 'hielo' | 'oro';
@@ -86,6 +86,128 @@ const TEMAS: Record<Tema, TemaConfig> = {
     cardBorder: 'rgba(255,183,3,0.28)',
   },
 };
+
+// ── Encabezado especial: Las Promos Más Bravas ────────────────────
+
+const SPARKLES = [
+  { char: '✦', top: '18%', left: '11%',  delay: '0s',    size: '1rem'   },
+  { char: '✧', top: '13%', left: '83%',  delay: '0.8s',  size: '0.8rem' },
+  { char: '✦', top: '66%', left: '5%',   delay: '1.5s',  size: '0.7rem' },
+  { char: '✧', top: '60%', left: '89%',  delay: '0.4s',  size: '0.9rem' },
+  { char: '✦', top: '40%', left: '2%',   delay: '2.1s',  size: '0.6rem' },
+  { char: '✧', top: '32%', left: '94%',  delay: '1.1s',  size: '0.75rem'},
+];
+
+function SeccionHeaderPromos() {
+  return (
+    <div className="relative py-16 px-6 text-center overflow-hidden"
+      style={{ background: 'linear-gradient(175deg, #1F1400 0%, #4A2E00 40%, #0D0A00 100%)' }}>
+
+      {/* Glow superior intenso */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at 50% -10%, rgba(255,183,3,0.60) 0%, transparent 60%)' }} />
+
+      {/* Destellos */}
+      {SPARKLES.map((s, i) => (
+        <span key={i} className="absolute destello"
+          style={{ top: s.top, left: s.left, fontSize: s.size, animationDelay: s.delay }}>
+          {s.char}
+        </span>
+      ))}
+
+      {/* Contenido */}
+      <div className="relative z-10">
+        <div className="text-5xl sm:text-6xl mb-4 leading-none"
+          style={{ filter: 'drop-shadow(0 0 28px rgba(255,183,3,0.9))' }}>
+          ⚡
+        </div>
+        <h2 className="shimmer-oro font-display leading-none tracking-widest mb-0"
+          style={{ fontSize: 'clamp(2.2rem, 9vw, 4rem)' }}>
+          LAS PROMOS
+        </h2>
+        <h2 className="shimmer-oro font-display leading-none tracking-widest mb-4"
+          style={{ fontSize: 'clamp(3rem, 12vw, 5.5rem)' }}>
+          MÁS BRAVAS
+        </h2>
+        <div className="flex justify-center mb-3">
+          <Ornamento color="#FFB703" />
+        </div>
+        <p className="text-xs uppercase tracking-[0.35em] font-semibold"
+          style={{ color: 'rgba(255,183,3,0.65)' }}>
+          La razón por la que volvés.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Card de promo — formato ticket ────────────────────────────────
+
+function FilaPromo({ item }: { item: ItemMenu }) {
+  return (
+    <div className="rounded-2xl overflow-hidden relative"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,183,3,0.07) 0%, rgba(193,18,31,0.09) 100%)',
+        border: '1px solid rgba(255,183,3,0.35)',
+        boxShadow: '0 0 24px rgba(255,183,3,0.12), inset 0 1px 0 rgba(255,183,3,0.08)',
+      }}>
+
+      {/* Ribbon de día */}
+      {item.dia && (
+        <div className="absolute top-3 right-3">
+          <span className="font-display text-[10px] tracking-wider px-2.5 py-1 rounded-full"
+            style={{ background: 'rgba(255,183,3,0.12)', color: '#FFB703', border: '1px solid rgba(255,183,3,0.3)' }}>
+            {item.dia}
+          </span>
+        </div>
+      )}
+
+      <div className="p-5 pb-4">
+        {/* valorTag prominente */}
+        {item.valorTag && (
+          <div className="inline-flex items-center gap-1.5 mb-3 px-3 py-1 rounded-full text-xs font-bold"
+            style={{ background: 'rgba(193,18,31,0.2)', color: '#FF7070', border: '1px solid rgba(193,18,31,0.35)' }}>
+            🔥 {item.valorTag}
+          </div>
+        )}
+
+        {/* Nombre */}
+        <h3 className="font-display text-brand-cream tracking-wide leading-tight mb-1.5"
+          style={{ fontSize: '1.15rem', paddingRight: item.dia ? '5rem' : '0' }}>
+          {item.nombre.toUpperCase()}
+        </h3>
+
+        {/* Descripción */}
+        {item.descripcion && (
+          <p className="text-brand-cream/45 text-xs leading-relaxed mb-3">{item.descripcion}</p>
+        )}
+
+        {/* Acompañamientos */}
+        {item.acompanamientos && item.acompanamientos.length > 0 && (
+          <p className="text-[11px] leading-relaxed">
+            <span className="font-bold text-[10px] uppercase tracking-wider" style={{ color: '#FFB703' }}>INCLUYE </span>
+            <span className="text-brand-cream/55">{item.acompanamientos.join(' · ')}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Separador tipo ticket */}
+      <div className="h-px mx-5"
+        style={{ background: 'linear-gradient(to right, transparent, rgba(255,183,3,0.35), transparent)' }} />
+
+      {/* Precio grande y centrado */}
+      <div className="px-5 py-4 text-center">
+        {item.precioRegular && (
+          <p className="text-brand-cream/30 text-xs line-through mb-0.5">L.{item.precioRegular}</p>
+        )}
+        <p className="font-display leading-none"
+          style={{ fontSize: '3.5rem', color: '#FFB703', textShadow: '0 0 30px rgba(255,183,3,0.45)' }}>
+          L.{item.precio}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // ── Ornamento decorativo ───────────────────────────────────────────
 
@@ -305,7 +427,7 @@ interface CartaMenuProps {
 }
 
 export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
-  const [seccionActiva, setSeccionActiva] = useState('alitas');
+  const [seccionActiva, setSeccionActiva] = useState('promos');
   const navRef = useRef<HTMLDivElement>(null);
 
   // Detectar sección visible
@@ -361,15 +483,22 @@ export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
           style={{ background: 'rgba(13,6,2,0.97)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           {SECCIONES.map(({ id, icon, label }) => {
             const activo = seccionActiva === id;
+            const esPromos = id === 'promos';
             return (
               <button
                 key={id}
                 onClick={() => irA(id)}
                 className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
                 style={activo ? {
-                  background: '#C1121F',
-                  color: '#FFF8F0',
-                  boxShadow: '0 0 12px rgba(193,18,31,0.45)',
+                  background: esPromos ? '#FFB703' : '#C1121F',
+                  color: esPromos ? '#0D0A00' : '#FFF8F0',
+                  boxShadow: esPromos
+                    ? '0 0 14px rgba(255,183,3,0.55)'
+                    : '0 0 12px rgba(193,18,31,0.45)',
+                } : esPromos ? {
+                  background: 'rgba(255,183,3,0.12)',
+                  color: 'rgba(255,183,3,0.85)',
+                  border: '1px solid rgba(255,183,3,0.22)',
                 } : {
                   background: 'rgba(255,255,255,0.06)',
                   color: 'rgba(255,248,240,0.55)',
@@ -382,6 +511,14 @@ export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
           })}
         </div>
       </div>
+
+      {/* ── Sección: Las Promos Más Bravas — PRIMERA ─── */}
+      <section id="sec-promos">
+        <SeccionHeaderPromos />
+        <div className="px-4 py-6 space-y-4" style={{ background: '#0D0A00' }}>
+          {cat('promos').map(i => <FilaPromo key={i.id} item={i} />)}
+        </div>
+      </section>
 
       {/* ── Sección: Alitas ─── */}
       <section id="sec-alitas">
@@ -407,7 +544,7 @@ export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
         </div>
       </section>
 
-      {/* ── Sección: Pupusas (tagline propio) ─── */}
+      {/* ── Sección: Pupusas ─── */}
       <section id="sec-pupusas">
         <SeccionHeader titulo="Pupusas" icon="🫓" tema="tierra" taglineOverride="Solo miércoles y jueves." />
         <div className="px-4 py-6 space-y-3" style={{ background: '#1A1000' }}>
@@ -425,14 +562,6 @@ export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
           tieneSub={tieneSub}
           mostrarPrecios={mostrarPreciosBebidas}
         />
-      </section>
-
-      {/* ── Sección: Promos — tema oro ─── */}
-      <section id="sec-promos">
-        <SeccionHeader titulo="Promos" icon="⚡" tema="oro" />
-        <div className="px-4 py-6 space-y-3" style={{ background: '#0D0A00' }}>
-          {cat('promos').map(i => <FilaItem key={i.id} item={i} mostrarPrecio tema="oro" />)}
-        </div>
       </section>
 
       {/* ── Footer ─── */}

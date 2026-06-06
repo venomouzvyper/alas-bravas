@@ -111,3 +111,27 @@ body {
   50%       { box-shadow: 0 0 18px 5px rgba(193,18,31,0.65), 0 0 30px 8px rgba(193,18,31,0.22); }
 }
 .btn-breathe { animation: btn-breathe 3.5s ease-in-out infinite; }
+
+/* ── Las Promos Más Bravas — /carta ──────────────────────────── */
+@keyframes shimmer-oro {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes destello {
+  0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg);  }
+  50%       { opacity: 1; transform: scale(1)   rotate(12deg); }
+}
+.shimmer-oro {
+  background: linear-gradient(90deg, #A86B00 0%, #FFB703 28%, #FFF8D0 50%, #FFB703 72%, #A86B00 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer-oro 3.5s linear infinite;
+}
+.destello {
+  color: #FFB703;
+  pointer-events: none;
+  animation: destello 2.5s ease-in-out infinite;
+  text-shadow: 0 0 8px rgba(255,183,3,0.8);
+}
