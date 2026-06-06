@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** La Carta QR, generador de QR de marca, auditoría de contenido del menú (ver sección abajo)
+- **Última sesión:** Rediseño de sección Promos en /carta — carbón vivo, EmberParticles, paleta roja (ver sección abajo)
 
 ---
 
@@ -506,6 +506,40 @@ Supabase devuelve campos en `snake_case` (`gradient_from`, `valor_tag`, `precio_
 - `app/admin/configuracion/ConfiguracionAdmin.tsx` — 4 secciones de config
 - `app/api/admin/configuracion/route.ts` — PATCH genérico por clave/valor
 - `supabase/schema.sql` — tabla `configuracion` + columnas nuevas en `menu_items`
+
+---
+
+## Sesión Rediseño Sección Promos en /carta ✅
+
+**Objetivo:** Hacer que la sección de promos destaque del resto — primera posición, diseño diferenciado, sin sacrificar claridad de decisión para el cliente.
+
+### Cambios en `/carta` (`components/sections/CartaMenu.tsx`)
+
+**Posición:** Promos es ahora la primera sección (antes de Alitas). El nav sticky la muestra primero y con tratamiento dorado especial (inactivo: borde dorado tenue; activo: pill dorado).
+
+**`SeccionHeaderPromos` — header propio con carbón vivo:**
+- Nombre: "LAS PROMOS / MÁS BRAVAS" en dos líneas con shimmer metálico dorado (CSS `background-clip: text`)
+- Fondo: negro carbón `#090100` con 3 capas de `radial-gradient` rojos/naranjas animadas con `carbon-brasa-a/b/c` (5.1s, 3.7s, 2.3s — no sincronizan, efecto orgánico)
+- Partículas: `EmberParticles` con paleta `['#FF4500', '#E85D04', '#C1121F', '#FF6B00', '#FFB703']`
+- Sin emoji, sin slogan
+
+**`FilaPromo` — cards con paleta roja:**
+- Fondo `rgba(100,10,5,0.14)`, borde `rgba(193,18,31,0.32)`
+- Precio `1.75rem` en `#FF7050`, inline en columna derecha (no sección propia)
+- Badge de día (`Viernes`, `Mié / Jue / Dom`) apilado **debajo del precio** en la columna derecha — sin solapamiento
+- `valorTag` en rojo con 🔥, `INCLUYE` en `#E85D04`
+
+**Principio de diseño confirmado:** efectos visuales solo en headers de sección. Las cards de ítems deben ser simples — el cliente necesita ver el plato y el precio y decidir rápido, sin distracciones.
+
+### CSS añadido (`app/globals.css`)
+- `@keyframes shimmer-oro` + `.shimmer-oro` — shimmer metálico para el título
+- `@keyframes destello` + `.destello` — ya no se usa en producción (limpiable)
+- `@keyframes carbon-brasa-a/b/c` — pulsación del fondo carbón
+- `@keyframes chispa-sube` — ya no se usa en producción (limpiable)
+
+### Archivos clave
+- `components/sections/CartaMenu.tsx` — `SeccionHeaderPromos`, `FilaPromo`, orden de secciones
+- `app/globals.css` — keyframes de la sección promos
 
 ---
 
