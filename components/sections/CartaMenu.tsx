@@ -156,6 +156,66 @@ function SeccionHeader({ titulo, icon, tema, taglineOverride }: {
   );
 }
 
+// ── Sección de bebidas — dos paneles ─────────────────────────────
+
+function SeccionBebidas({ refrescos, cervezas, todasBeb, tieneSub, mostrarPrecios }: {
+  refrescos: ItemMenu[];
+  cervezas: ItemMenu[];
+  todasBeb: ItemMenu[];
+  tieneSub: boolean;
+  mostrarPrecios: boolean;
+}) {
+  function FilaBebida({ item, acento }: { item: ItemMenu; acento: string }) {
+    return (
+      <div className="flex items-center gap-2.5 py-2.5 border-b last:border-b-0"
+        style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        <span className="text-sm shrink-0" style={{ opacity: 0.65 }}>{item.emoji}</span>
+        <span className="font-display text-brand-cream/82 text-sm tracking-wide flex-1 leading-snug">
+          {item.nombre.toUpperCase()}
+        </span>
+        {mostrarPrecios && (
+          <span className="font-display text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 leading-none"
+            style={{ color: acento, background: acento + '16', border: `1px solid ${acento}28` }}>
+            L.{item.precio}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  function Panel({ titulo, icon, items, acento, borderColor, bgColor }: {
+    titulo: string; icon: string; items: ItemMenu[];
+    acento: string; borderColor: string; bgColor: string;
+  }) {
+    if (items.length === 0) return null;
+    return (
+      <div className="rounded-2xl p-4" style={{ background: bgColor, border: `1px solid ${borderColor}` }}>
+        <p className="text-[10px] font-bold uppercase tracking-[0.4em] mb-2 pb-2 flex items-center gap-1.5"
+          style={{ color: acento + 'AA', borderBottom: `1px solid ${borderColor}` }}>
+          {icon} {titulo}
+        </p>
+        {items.map(i => <FilaBebida key={i.id} item={i} acento={acento} />)}
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4 py-5" style={{ background: '#071018' }}>
+      {tieneSub ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Panel titulo="REFRESCOS" icon="🧊" items={refrescos} acento="#00B4D8"
+            borderColor="rgba(0,180,216,0.15)" bgColor="rgba(0,180,216,0.04)" />
+          <Panel titulo="CERVEZAS"  icon="🍺" items={cervezas}  acento="#D4A017"
+            borderColor="rgba(212,160,23,0.2)" bgColor="rgba(212,160,23,0.05)" />
+        </div>
+      ) : (
+        <Panel titulo="BEBIDAS" icon="🧊" items={todasBeb} acento="#00B4D8"
+          borderColor="rgba(0,180,216,0.15)" bgColor="rgba(0,180,216,0.04)" />
+      )}
+    </div>
+  );
+}
+
 // ── Fila de ítem ──────────────────────────────────────────────────
 
 function FilaItem({ item, mostrarPrecio, tema }: {
@@ -355,48 +415,16 @@ export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
         </div>
       </section>
 
-      {/* ── Sección: Bebidas — tema hielo ─── */}
+      {/* ── Sección: Bebidas — dos paneles ─── */}
       <section id="sec-bebidas">
         <SeccionHeader titulo="Bebidas" icon="❄️" tema="hielo" />
-        <div className="px-4 py-6" style={{ background: '#071018' }}>
-          {tieneSub ? (
-            <>
-              {refrescos.length > 0 && (
-                <div className="mb-6">
-                  <p className="text-center text-[11px] font-bold uppercase tracking-[0.4em] mb-4"
-                    style={{ color: 'rgba(202,240,248,0.3)' }}>
-                    ── REFRESCOS ──
-                  </p>
-                  <div className="space-y-3">
-                    {refrescos.map(i => <FilaItem key={i.id} item={i} mostrarPrecio={mostrarPreciosBebidas} tema="hielo" />)}
-                  </div>
-                </div>
-              )}
-              {refrescos.length > 0 && cervezas.length > 0 && (
-                <div className="flex items-center gap-3 my-5 px-2">
-                  <div className="flex-1 h-px" style={{ background: 'rgba(0,180,216,0.12)' }} />
-                  <span style={{ color: 'rgba(0,180,216,0.35)', fontSize: '10px' }}>❄</span>
-                  <div className="flex-1 h-px" style={{ background: 'rgba(0,180,216,0.12)' }} />
-                </div>
-              )}
-              {cervezas.length > 0 && (
-                <div>
-                  <p className="text-center text-[11px] font-bold uppercase tracking-[0.4em] mb-4"
-                    style={{ color: 'rgba(202,240,248,0.3)' }}>
-                    🍺 ── CERVEZAS ── 🍺
-                  </p>
-                  <div className="space-y-3">
-                    {cervezas.map(i => <FilaItem key={i.id} item={i} mostrarPrecio={mostrarPreciosBebidas} tema="hielo" />)}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="space-y-3">
-              {todasBeb.map(i => <FilaItem key={i.id} item={i} mostrarPrecio={mostrarPreciosBebidas} tema="hielo" />)}
-            </div>
-          )}
-        </div>
+        <SeccionBebidas
+          refrescos={refrescos}
+          cervezas={cervezas}
+          todasBeb={todasBeb}
+          tieneSub={tieneSub}
+          mostrarPrecios={mostrarPreciosBebidas}
+        />
       </section>
 
       {/* ── Sección: Promos — tema oro ─── */}
