@@ -23,11 +23,25 @@ export interface ItemMenu {
 export const MENU_ITEMS: ItemMenu[] = [
   // ── Alitas ─────────────────────────────────────────────────────────
   {
-    id: 'alitas-bravas',
+    id: 'alitas-bravas-6',
     categoria: 'alitas',
-    nombre: 'Alitas Bravas',
+    nombre: '6 Alitas Bravas',
     descripcion: 'Sazón propia · picantes',
     precio: 180,
+    acompanamientos: ['Papas fritas', 'Aderezo de la casa'],
+    spice: 'hot',
+    destacado: true,
+    valorTag: '🏆 ESPECIALIDAD',
+    emoji: '🔥',
+    gradientFrom: '#3D0000',
+    gradientTo: '#C1121F',
+  },
+  {
+    id: 'alitas-bravas-12',
+    categoria: 'alitas',
+    nombre: '12 Alitas Bravas',
+    descripcion: 'Sazón propia · picantes',
+    precio: 320,
     acompanamientos: ['Papas fritas', 'Aderezo de la casa'],
     spice: 'hot',
     destacado: true,

@@ -23,17 +23,16 @@
 -- https://supabase.com/dashboard/project/dgacqokpfwrizgcivsbr/sql/new
 -- ═══════════════════════════════════════════════════════════════
 
--- 1. Nuevo ítem: Alitas Bravas (especialidad de la casa)
---    ⚠️  Verificar precio con Mario antes de activar
+-- 1. Nuevos ítems: 6 y 12 Alitas Bravas (especialidad de la casa, sin selección de salsa)
 INSERT INTO menu_items (categoria, nombre, descripcion, precio, acompanamientos, spice, destacado, valor_tag, emoji, gradient_from, gradient_to, activo, orden)
-VALUES ('alitas', 'Alitas Bravas', 'Sazón propia · picantes', 180,
-        ARRAY['Papas fritas', 'Aderezo de la casa'],
-        'hot', true, '🏆 ESPECIALIDAD', '🔥', '#3D0000', '#C1121F', true, 0)
+VALUES
+  ('alitas', '6 Alitas Bravas',  'Sazón propia · picantes', 180, ARRAY['Papas fritas', 'Aderezo de la casa'], 'hot', true, '🏆 ESPECIALIDAD', '🔥', '#3D0000', '#C1121F', true, 0),
+  ('alitas', '12 Alitas Bravas', 'Sazón propia · picantes', 320, ARRAY['Papas fritas', 'Aderezo de la casa'], 'hot', true, '🏆 ESPECIALIDAD', '🔥', '#3D0000', '#C1121F', true, 1)
 ON CONFLICT DO NOTHING;
 
--- Reordenar alitas: Alitas Bravas (0) → 6 Alitas (1) → 12 Alitas (2)
-UPDATE menu_items SET orden = 1 WHERE nombre = '6 Alitas'  AND categoria = 'alitas';
-UPDATE menu_items SET orden = 2 WHERE nombre = '12 Alitas' AND categoria = 'alitas';
+-- Reordenar alitas: 6 Bravas (0), 12 Bravas (1), 6 Alitas (2), 12 Alitas (3)
+UPDATE menu_items SET orden = 2 WHERE nombre = '6 Alitas'  AND categoria = 'alitas';
+UPDATE menu_items SET orden = 3 WHERE nombre = '12 Alitas' AND categoria = 'alitas';
 
 -- 2. "Asada a las brasas" → "Asada a la plancha"
 UPDATE menu_items SET descripcion = 'Asada a la plancha'             WHERE descripcion = 'Asada a las brasas';
