@@ -66,6 +66,7 @@ function isDisponible(item: ItemMenu): boolean {
   return false;
 }
 function necesitaSabor(item: ItemMenu): boolean {
+  if (item.nombre.toLowerCase().includes("bravas")) return false;
   return item.categoria === "alitas" || item.nombre.toLowerCase().includes("alitas");
 }
 function getCrossSell(item: ItemMenu, items: ItemMenu[], compraBebidas: boolean): ItemMenu[] {
@@ -97,20 +98,11 @@ function getBannerData(): BannerData | null {
   const d = getHondurasTime().getDay();
   if (d === 3 || d === 4) return {
     titulo: "🔥 HOY ES DÍA DE ALITAS",
-    sub: "Solo miércoles, jueves y domingos · ¡Aprovechá!",
+    sub: "Solo miércoles y jueves · ¡Aprovechá!",
     tipo: "hoy",
     ofertas: [
-      { label: "14 ALITAS BB O BÚFALO", precio: "L.300" },
-      { label: "7 ALITAS BB O BÚFALO",  precio: "L.180" },
-    ],
-  };
-  if (d === 0) return {
-    titulo: "🔥 DOMINGO DE ALITAS",
-    sub: "Promo especial de domingos · ¡Solo hoy!",
-    tipo: "hoy",
-    ofertas: [
-      { label: "14 ALITAS BB O BÚFALO", precio: "L.300" },
-      { label: "7 ALITAS BB O BÚFALO",  precio: "L.180" },
+      { label: "14 ALITAS BBQ O BÚFALO", precio: "L.300" },
+      { label: "7 ALITAS BBQ O BÚFALO",  precio: "L.180" },
     ],
   };
   if (d === 5) return {
@@ -119,9 +111,9 @@ function getBannerData(): BannerData | null {
     tipo: "hoy",
     ofertas: [{ label: "2 PLATOS A ELEGIR", precio: "L.300" }],
   };
-  if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié, jue y dom · Trae a tus amigos", tipo: "prox" };
-  if (d === 6) return { titulo: "🔥 Mañana: domingo de alitas por L.300 — ¡anotalo!", sub: "Promo especial todos los domingos", tipo: "prox" };
-  return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos mié, jue, vie y domingos", tipo: "prox" };
+  if (d === 2) return { titulo: "🔥 Mañana: 14 alitas por L.300 — ¿volvés?", sub: "Promo activa mié y jue · Trae a tus amigos", tipo: "prox" };
+  if (d === 6) return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¡anotalo!", sub: "Promos mié, jue y viernes", tipo: "prox" };
+  return { titulo: "🔥 El miércoles: 14 alitas por L.300 — ¿lo anotás?", sub: "Promos mié, jue y viernes", tipo: "prox" };
 }
 type WaMsgBase = {
   nombre: string; notas: string;
@@ -757,7 +749,7 @@ export function MenuOrden({ items, promoDia, mandaditosTel, horaApertura, horaCi
                 <motion.div key="empty-promos" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-2 lg:col-span-3 py-16 text-center">
                   <p className="text-5xl mb-4">🔥</p>
                   <p className="font-display text-2xl text-brand-cream tracking-wider">VOLVÉ EL MIÉRCOLES</p>
-                  <p className="text-brand-cream/40 text-sm mt-2">Promos especiales los mié, jue, dom y viernes</p>
+                  <p className="text-brand-cream/40 text-sm mt-2">Promos especiales los mié, jue y viernes</p>
                 </motion.div>
               ) : null}
             </AnimatePresence>

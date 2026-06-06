@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
 };
 
-export type PromoDia = "mie-jue" | "dom" | "viernes" | null;
+export type PromoDia = "mie-jue" | "viernes" | null;
 
 function getPromoDia(): PromoDia {
   const ahora = new Date(
@@ -26,7 +26,6 @@ function getPromoDia(): PromoDia {
   );
   const dia = ahora.getDay();
   if (dia === 3 || dia === 4) return "mie-jue";
-  if (dia === 0) return "dom";
   if (dia === 5) return "viernes";
   return null;
 }

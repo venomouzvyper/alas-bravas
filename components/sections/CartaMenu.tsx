@@ -47,7 +47,7 @@ const TEMAS: Record<Tema, TemaConfig> = {
     headerBg: 'linear-gradient(175deg, #1A0F00 0%, #4A2000 45%, #120800 100%)',
     headerGlow: 'radial-gradient(ellipse at 50% -20%, rgba(139,58,0,0.55) 0%, transparent 65%)',
     titleColor: '#E85D04',
-    tagline: 'A las brasas, como debe ser.',
+    tagline: 'A la plancha, como debe ser.',
     taglineColor: 'rgba(232,93,4,0.65)',
     accentColor: '#E85D04',
     cardBg: 'rgba(232,93,4,0.05)',
