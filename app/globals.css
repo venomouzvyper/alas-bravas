@@ -135,3 +135,22 @@ body {
   animation: destello 2.5s ease-in-out infinite;
   text-shadow: 0 0 8px rgba(255,183,3,0.8);
 }
+
+/* Carbón vivo — fondo animado de Las Promos Más Bravas */
+@keyframes carbon-brasa-a {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1;   }
+}
+@keyframes carbon-brasa-b {
+  0%, 100% { opacity: 0.35; }
+  62%       { opacity: 0.9;  }
+}
+@keyframes carbon-brasa-c {
+  0%, 100% { opacity: 0.2;  }
+  38%       { opacity: 0.75; }
+}
+@keyframes chispa-sube {
+  0%   { transform: translateY(0)       scale(1);    opacity: 0.9; }
+  75%  { opacity: 0.4; }
+  100% { transform: translateY(-160px)  scale(0.08); opacity: 0;   }
+}
