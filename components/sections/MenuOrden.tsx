@@ -276,7 +276,7 @@ function MenuCard({ item, cantidad, sabor, disponible, onTap, onCambiar, onSabor
       {/* Contenido — overflow-hidden para no romper la altura fija */}
       <div className={`bg-brand-gray-900 flex flex-col flex-1 overflow-hidden justify-between ${esPromo ? "p-4" : "p-3"}`}>
         <div>
-          <h3 className={`font-display text-brand-cream tracking-wide leading-tight mb-1 line-clamp-1 ${esPromo ? "text-xl" : "text-base sm:text-lg"}`}>
+          <h3 className={`font-display text-brand-cream tracking-wide leading-tight mb-1 line-clamp-2 ${esPromo ? "text-xl" : "text-base sm:text-lg"}`}>
             {item.nombre.toUpperCase()}
           </h3>
           <p className={`text-brand-cream/50 leading-snug line-clamp-2 mb-1 ${esPromo ? "text-sm" : "text-xs sm:text-sm"}`}>
