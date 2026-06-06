@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Menú definitivo, Ruta C Mandaditos, configuración dinámica desde admin (ver sección abajo)
+- **Última sesión:** La Carta QR, generador de QR de marca, auditoría de contenido del menú (ver sección abajo)
 
 ---
 
@@ -506,6 +506,100 @@ Supabase devuelve campos en `snake_case` (`gradient_from`, `valor_tag`, `precio_
 - `app/admin/configuracion/ConfiguracionAdmin.tsx` — 4 secciones de config
 - `app/api/admin/configuracion/route.ts` — PATCH genérico por clave/valor
 - `supabase/schema.sql` — tabla `configuracion` + columnas nuevas en `menu_items`
+
+---
+
+## Sesión La Carta QR y Auditoría de Contenido ✅
+
+**Objetivo:** Crear `/carta` — menú artístico exclusivo para QR, generador de QR de marca en admin, y auditoría completa del contenido del menú (descripciones, nomenclatura BBQ, psicología de menú).
+
+### `/carta` — Menú QR
+
+Nueva página `app/carta/page.tsx` (Server Component, `force-dynamic`, `robots: noindex`). No aparece en header ni footer — solo accesible por QR. Lee datos de Supabase + config `mostrar_precios_bebidas`.
+
+**Arquitectura:** `CartaMenu` (`components/sections/CartaMenu.tsx`) — sin Header/Footer del sitio principal. Tiene su propio header mínimo (logo + "LA CARTA") y barra sticky de secciones.
+
+**6 secciones temáticas con identidad visual propia:**
+
+| Sección | Tema | Fondo | Acento | Tagline |
+|---|---|---|---|---|
+| 🍗 Alitas | `fuego` | `#1A0400` | `#FFB703` | "Crujientes. Jugosas. Bravas." |
+| 🥩 Carnes | `brasa` | `#120800` | `#E85D04` | "A las brasas, como debe ser." |
+| 🍌 Tajadas | `tierra` | `#1A1000` | `#D4A017` | "El complemento perfecto." |
+| 🫓 Pupusas | `tierra` | `#1A1000` | `#D4A017` | "Solo miércoles y jueves." |
+| ❄️ Bebidas | `hielo` | `#071018` | `#00B4D8` | "Frío que quema." |
+| ⚡ Promos | `oro` | `#0D0A00` | `#FFB703` | "La razón por la que volvés." |
+
+Cada header tiene un `SeccionHeader` con: emoji grande con glow, título en `clamp(3.5rem, 14vw, 5.5rem)`, ornamento SVG (`◆` con líneas), tagline. La sección bebidas tiene efecto de borde de hielo (gradiente blanco en el top/bottom del header).
+
+**Items como filas elegantes** (`FilaItem`): badges (★ TOP, valorTag, día disponible) + nombre en `font-display` + descripción (omitida en bebidas) + "INCLUYE" label en color acento + precio. Para promos, precio en `1.75rem`.
+
+**Footer:** Solo nombre, dirección y horario — sin WhatsApp (el cliente ya está en el restaurante).
+
+**`WhatsAppButton` oculto en `/carta`** — agregado al check de rutas en `components/ui/WhatsAppButton.tsx`.
+
+**IntersectionObserver** detecta la sección visible y resalta el botón correspondiente en el nav sticky.
+
+### `SeccionBebidas` — layout dos paneles
+
+Componente especial para bebidas (no usa `FilaItem`). Dos paneles lado a lado en `sm:` (tablet/desktop), apilados en mobile:
+
+- **Panel Refrescos** — borde/acento `#00B4D8` (azul hielo), fondo `rgba(0,180,216,0.04)`
+- **Panel Cervezas** — borde/acento `#D4A017` (ámbar), fondo `rgba(212,160,23,0.05)`
+
+Cada fila: `emoji + nombre + badge de precio`. Sin descripciones, sin cards. Densidad máxima — resuelve el problema de 80% de espacio desperdiciado con cards vacías.
+
+### Generador de QR — `/admin/qr`
+
+`app/admin/qr/page.tsx` (Client Component). Usa `qrcode.react` (instalado).
+
+- QR apunta a `https://www.alasbravashn.com/carta`
+- **Marca propia:** fondo crema `#FFF8F0`, módulos rojo `#C1121F`, logo centrado (`excavate: true`), nivel de corrección `"H"` (30%)
+- Botón "Descargar PNG" — extrae canvas y genera link de descarga
+- Enlace "QR" agregado a `AdminNav`
+
+### Psicología de menú — cambios de contenido
+
+**Promos `valorTag`:**
+- "2 ALITAS EXTRA" → "AHORRÁS L.20" (14 alitas)
+- "1 ALITA GRATIS" → "AHORRÁS L.30" (7 alitas)
+- Razón: la cantidad extra confunde (¿extra de qué base?). El dinero es más concreto y persuasivo.
+
+**BB → BBQ en todo el proyecto:**
+- Nombres de promos: "14 Alitas BB o Búfalo" → "14 Alitas BBQ o Búfalo"
+- Todas las descripciones: "BB o Búfalo" → "BBQ o Búfalo"
+
+**14 descripciones simplificadas** (principio: informar, no publicitar):
+- Alitas: `"BBQ o Búfalo — a elegir"` (la única decisión que importa)
+- Carnes: `"Asada a las brasas"` / `"Asada a las brasas con chorizo"`
+- Tajadas: `"Fritas y preparadas"` / `"Doble porción · fritas y preparadas"`
+- Pupusas: `"Rellenas de quesillo"` / `"Rellenas de chicharrón"` (galleta → en valorTag)
+- Promos de carne: sin "Solo los viernes" (ya está en el badge `dia`)
+- Promos de alitas: `"BBQ o Búfalo · con galleta de regalo"`
+
+**Acompañamientos:** de `text-brand-cream/25` a `text-brand-cream/55` con etiqueta **"INCLUYE"** en color acento. Los acompañamientos son valor percibido — deben verse, no esconderse.
+
+**Nombres completos en bebidas:**
+- "Portátil" → "Portátil Coca Cola / Pepsi / Mirinda / Sabores"
+- "Lata Pepsi / Mountain Dew" → "Lata Pepsi / Otros Sabores / Mountain Dew"
+
+**`line-clamp-2` en cards de `/menu`:** Los nombres largos como "CARNE ASADA DE CERDO CON CHORIZO" ya no se truncan con `...`.
+
+### Fix hero
+"…o a las malas?" → "…o a las bravas?" y botón "A LAS MALAS" → "A LAS BRAVAS" en `components/sections/HeroReveal.tsx`.
+
+### Pendiente en Supabase
+Todos los cambios de datos están en `supabase/update_valor_tags.sql`. Ejecutar en el SQL Editor:
+`https://supabase.com/dashboard/project/dgacqokpfwrizgcivsbr/sql/new`
+
+### Archivos clave de esta sesión
+- `app/carta/page.tsx` — Server Component, `force-dynamic`, `robots: noindex`
+- `components/sections/CartaMenu.tsx` — carta completa con 6 secciones temáticas
+- `app/admin/qr/page.tsx` — generador de QR de marca
+- `app/admin/AdminNav.tsx` — enlace QR agregado
+- `components/ui/WhatsAppButton.tsx` — oculto en `/carta`
+- `lib/menu-data.ts` — descripciones limpias, BBQ, nombres completos
+- `supabase/update_valor_tags.sql` — SQL acumulado para actualizar producción
 
 ---
 
