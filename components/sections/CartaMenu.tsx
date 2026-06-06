@@ -128,12 +128,24 @@ function SeccionHeaderPromos() {
 
       {/* Contenido */}
       <div className="relative z-10">
-        <h2 className="shimmer-oro font-display leading-none tracking-widest mb-0"
-          style={{ fontSize: 'clamp(2.2rem, 9vw, 4rem)' }}>
+        <h2 className="font-display leading-none tracking-widest mb-0"
+          style={{
+            fontSize: 'clamp(2.2rem, 9vw, 4rem)',
+            background: 'linear-gradient(90deg, #A86B00 0%, #FFB703 28%, #FFF8D0 50%, #FFB703 72%, #A86B00 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}>
           LAS PROMOS
         </h2>
-        <h2 className="shimmer-oro font-display leading-none tracking-widest mb-4"
-          style={{ fontSize: 'clamp(3rem, 12vw, 5.5rem)' }}>
+        <h2 className="font-display leading-none tracking-widest mb-4"
+          style={{
+            fontSize: 'clamp(3rem, 12vw, 5.5rem)',
+            background: 'linear-gradient(90deg, #A86B00 0%, #FFB703 28%, #FFF8D0 50%, #FFB703 72%, #A86B00 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}>
           MÁS BRAVAS
         </h2>
         <div className="flex justify-center">
@@ -186,7 +198,7 @@ function FilaPromo({ item }: { item: ItemMenu }) {
             <p className="text-brand-cream/30 text-xs line-through leading-none">L.{item.precioRegular}</p>
           )}
           <p className="font-display leading-none"
-            style={{ fontSize: '1.75rem', color: '#FF7050', textShadow: '0 0 14px rgba(193,18,31,0.5)' }}>
+            style={{ fontSize: '1.75rem', color: '#FFB703', textShadow: '0 0 14px rgba(255,183,3,0.4)' }}>
             L.{item.precio}
           </p>
           {item.dia && (
