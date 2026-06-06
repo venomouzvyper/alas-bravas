@@ -7,7 +7,7 @@ const WA_LINK =
 
 export function WhatsAppButton() {
   const pathname = usePathname();
-  if (pathname.startsWith('/admin') || pathname.startsWith('/menu')) return null;
+  if (pathname.startsWith('/admin') || pathname.startsWith('/menu') || pathname.startsWith('/carta')) return null;
 
   return (
     <a
