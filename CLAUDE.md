@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Rediseño de sección Promos en /carta — carbón vivo, EmberParticles, paleta roja (ver sección abajo)
+- **Última sesión:** Actualización del menú — Alitas Bravas, Chuleta Barbacoa, nuevas pupusas, ajustes de promos y pulido visual de /carta
 
 ---
 
@@ -558,7 +558,7 @@ Nueva página `app/carta/page.tsx` (Server Component, `force-dynamic`, `robots: 
 | Sección | Tema | Fondo | Acento | Tagline |
 |---|---|---|---|---|
 | 🍗 Alitas | `fuego` | `#1A0400` | `#FFB703` | "Crujientes. Jugosas. Bravas." |
-| 🥩 Carnes | `brasa` | `#120800` | `#E85D04` | "A las brasas, como debe ser." |
+| 🥩 Carnes | `brasa` | `#120800` | `#E85D04` | "A la plancha, como debe ser." |
 | 🍌 Tajadas | `tierra` | `#1A1000` | `#D4A017` | "El complemento perfecto." |
 | 🫓 Pupusas | `tierra` | `#1A1000` | `#D4A017` | "Solo miércoles y jueves." |
 | ❄️ Bebidas | `hielo` | `#071018` | `#00B4D8` | "Frío que quema." |
@@ -605,11 +605,11 @@ Cada fila: `emoji + nombre + badge de precio`. Sin descripciones, sin cards. Den
 
 **14 descripciones simplificadas** (principio: informar, no publicitar):
 - Alitas: `"BBQ o Búfalo — a elegir"` (la única decisión que importa)
-- Carnes: `"Asada a las brasas"` / `"Asada a las brasas con chorizo"`
+- Carnes: `"Asada a la plancha"` / `"Asada a la plancha con chorizo"`
 - Tajadas: `"Fritas y preparadas"` / `"Doble porción · fritas y preparadas"`
 - Pupusas: `"Rellenas de quesillo"` / `"Rellenas de chicharrón"` (galleta → en valorTag)
 - Promos de carne: sin "Solo los viernes" (ya está en el badge `dia`)
-- Promos de alitas: `"BBQ o Búfalo · con galleta de regalo"`
+- Promos de alitas: `"BBQ o Búfalo — a elegir"`
 
 **Acompañamientos:** de `text-brand-cream/25` a `text-brand-cream/55` con etiqueta **"INCLUYE"** en color acento. Los acompañamientos son valor percibido — deben verse, no esconderse.
 
@@ -622,9 +622,8 @@ Cada fila: `emoji + nombre + badge de precio`. Sin descripciones, sin cards. Den
 ### Fix hero
 "…o a las malas?" → "…o a las bravas?" y botón "A LAS MALAS" → "A LAS BRAVAS" en `components/sections/HeroReveal.tsx`.
 
-### Pendiente en Supabase
-Todos los cambios de datos están en `supabase/update_valor_tags.sql`. Ejecutar en el SQL Editor:
-`https://supabase.com/dashboard/project/dgacqokpfwrizgcivsbr/sql/new`
+### SQL en Supabase
+Los cambios de esta sesión fueron ejecutados ✅. Ver historial completo en `supabase/update_valor_tags.sql`.
 
 ### Archivos clave de esta sesión
 - `app/carta/page.tsx` — Server Component, `force-dynamic`, `robots: noindex`
@@ -671,6 +670,61 @@ La barra flotante `fixed bottom-0` en `/menu` cubría el footer.
 ---
 
 
+
+## Sesión Actualización del Menú y Pulido de /carta ✅
+
+**Objetivo:** Reflejar cambios reales del menú del restaurante, ajustar lógica de promos y mejorar la legibilidad del header de promos en `/carta`.
+
+### Cambios en el menú (`lib/menu-data.ts` + Supabase ✅)
+
+**Nuevos ítems — Alitas Bravas (especialidad de la casa):**
+- `6 Alitas Bravas` L.180 · `12 Alitas Bravas` L.320
+- `spice: 'hot'`, `destacado: true`, `valorTag: '🏆 ESPECIALIDAD'`
+- **Sin selección de salsa** — `necesitaSabor()` en `MenuOrden.tsx` devuelve `false` cuando `item.nombre.toLowerCase().includes("bravas")`
+- Aparecen primero en la sección Alitas (orden 0 y 1 en Supabase)
+
+**Carnes:**
+- Descripción: "Asada a las brasas" → "Asada a la plancha" (y "con chorizo")
+- "Chuleta Asada de Cerdo" → **Chuleta Barbacoa** (en `/menu`, `/carta` y promo de viernes)
+- Precios Chuleta con Chorizo y Carne de Cerdo con Chorizo: L.160 → **L.170**
+- Orden dentro de la sección: Carne Asada → Carne con Chorizo → Chuleta Barbacoa → Chuleta con Chorizo
+
+**Pupusas (nuevos ítems, Mié/Jue):**
+| Ítem | Precio |
+|------|--------|
+| 2 Pupusas de Quesillo | L.90 |
+| 2 Pupusas Mixtas (quesillo + chicharrón) | L.95 |
+| 3 Pupusas de Quesillo (existente) | L.100 |
+| 3 Pupusas de Chicharrón (existente) | L.110 |
+| 3 Pupusas Mixtas (quesillo + chicharrón) | L.110 |
+
+**Tajadas:** 2 Órdenes ahora incluye Ensalada en `acompanamientos`.
+
+**Promos:**
+- Galletas gratis eliminadas de pupusas y promos de alitas
+- Promos de alitas: `dia` cambiado de `"Mié / Jue / Dom"` → `"Mié / Jue"` — el domingo ya no tiene promos
+- `PromoDia` en `app/menu/page.tsx`: tipo `"dom"` eliminado; `getPromoDia()` no retorna domingo
+- Banner `getBannerData()`, texto estático y `isDisponible()` actualizados — sin referencias a domingos
+
+### Pulido visual de `/carta` — header de Promos (`CartaMenu.tsx`)
+
+**Título "LAS PROMOS / MÁS BRAVAS":**
+- Antes: clase `.shimmer-oro` — gradiente metálico animado horizontalmente (3.5s loop)
+- Ahora: gradiente metálico **estático** vía `background-clip: text` inline — sin movimiento
+- Las `EmberParticles` (55 partículas) siguen siendo el único elemento animado del header
+
+**Precio en `FilaPromo`:**
+- Antes: `#FF7050` (naranja-coral) con glow rojo
+- Ahora: `#FFB703` (brand-accent, dorado) con glow dorado — consistente con el resto de `/carta`
+
+### Archivos clave de esta sesión
+- `lib/menu-data.ts` — menú completo actualizado
+- `components/sections/MenuOrden.tsx` — `necesitaSabor()`, `getBannerData()`, textos sin domingo
+- `components/sections/CartaMenu.tsx` — tagline brasa, título estático, precio dorado
+- `app/menu/page.tsx` — `PromoDia` sin "dom"
+- `supabase/update_valor_tags.sql` — SQL completo ejecutado ✅
+
+---
 
 ```
 Frontend:    Next.js 16 (App Router) + TypeScript
