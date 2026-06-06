@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { ItemMenu } from '@/lib/menu-data';
+import { EmberParticles } from '@/components/ui/EmberParticles';
 
 // ── Secciones ─────────────────────────────────────────────────────
 
@@ -89,30 +90,6 @@ const TEMAS: Record<Tema, TemaConfig> = {
 
 // ── Encabezado especial: Las Promos Más Bravas ────────────────────
 
-const SPARKLES = [
-  { char: '✦', top: '18%', left: '11%',  delay: '0s',    size: '1rem'   },
-  { char: '✧', top: '13%', left: '83%',  delay: '0.8s',  size: '0.8rem' },
-  { char: '✦', top: '66%', left: '5%',   delay: '1.5s',  size: '0.7rem' },
-  { char: '✧', top: '60%', left: '89%',  delay: '0.4s',  size: '0.9rem' },
-  { char: '✦', top: '40%', left: '2%',   delay: '2.1s',  size: '0.6rem' },
-  { char: '✧', top: '32%', left: '94%',  delay: '1.1s',  size: '0.75rem'},
-];
-
-const BRASAS = [
-  { left:  '7%', top: '88%', dur: '2.1s', delay: '0s',    color: '#FF4500', size: '3px' },
-  { left: '16%', top: '82%', dur: '2.8s', delay: '0.7s',  color: '#FFB703', size: '2px' },
-  { left: '25%', top: '90%', dur: '1.9s', delay: '1.4s',  color: '#FF6B00', size: '4px' },
-  { left: '34%', top: '85%', dur: '3.0s', delay: '0.3s',  color: '#FF4500', size: '2px' },
-  { left: '43%', top: '87%', dur: '2.4s', delay: '2.1s',  color: '#FF3000', size: '3px' },
-  { left: '52%', top: '83%', dur: '2.0s', delay: '1.0s',  color: '#FFB703', size: '2px' },
-  { left: '61%', top: '89%', dur: '2.7s', delay: '0.5s',  color: '#FF6B00', size: '4px' },
-  { left: '70%', top: '84%', dur: '1.8s', delay: '1.8s',  color: '#FF4500', size: '2px' },
-  { left: '79%', top: '86%', dur: '3.2s', delay: '0.9s',  color: '#FFB703', size: '3px' },
-  { left: '88%', top: '91%', dur: '2.3s', delay: '2.6s',  color: '#FF3000', size: '2px' },
-  { left: '12%', top: '76%', dur: '2.6s', delay: '3.2s',  color: '#FF6B00', size: '2px' },
-  { left: '55%', top: '79%', dur: '1.7s', delay: '1.6s',  color: '#FFB703', size: '3px' },
-];
-
 function SeccionHeaderPromos() {
   return (
     <div className="relative py-16 px-6 text-center overflow-hidden"
@@ -146,26 +123,8 @@ function SeccionHeaderPromos() {
           animation: 'carbon-brasa-a 4.3s ease-in-out infinite reverse',
         }} />
 
-      {/* Brasas que suben */}
-      {BRASAS.map((b, i) => (
-        <span key={`b${i}`} className="absolute rounded-full pointer-events-none"
-          style={{
-            left: b.left, top: b.top,
-            width: b.size, height: b.size,
-            background: b.color,
-            boxShadow: `0 0 4px 2px ${b.color}80`,
-            animation: `chispa-sube ${b.dur} ease-out infinite`,
-            animationDelay: b.delay,
-          }} />
-      ))}
-
-      {/* Destellos ✦✧ */}
-      {SPARKLES.map((s, i) => (
-        <span key={`sp${i}`} className="absolute destello"
-          style={{ top: s.top, left: s.left, fontSize: s.size, animationDelay: s.delay }}>
-          {s.char}
-        </span>
-      ))}
+      {/* Partículas de brasa */}
+      <EmberParticles colors={['#FF4500', '#E85D04', '#C1121F', '#FF6B00', '#FFB703']} />
 
       {/* Contenido */}
       <div className="relative z-10">
@@ -189,25 +148,14 @@ function SeccionHeaderPromos() {
 
 function FilaPromo({ item }: { item: ItemMenu }) {
   return (
-    <div className="rounded-2xl p-4 relative"
+    <div className="rounded-2xl p-4"
       style={{
         background: 'rgba(100,10,5,0.14)',
         border: '1px solid rgba(193,18,31,0.32)',
         boxShadow: '0 0 18px rgba(193,18,31,0.08), inset 0 1px 0 rgba(255,70,30,0.06)',
       }}>
 
-      {/* Ribbon de día */}
-      {item.dia && (
-        <div className="absolute top-3 right-3">
-          <span className="font-display text-[10px] tracking-wider px-2.5 py-1 rounded-full"
-            style={{ background: 'rgba(193,18,31,0.14)', color: '#FF8060', border: '1px solid rgba(193,18,31,0.28)' }}>
-            {item.dia}
-          </span>
-        </div>
-      )}
-
-      <div className="flex items-start justify-between gap-4"
-        style={{ paddingRight: item.dia ? '4.5rem' : '0' }}>
+      <div className="flex items-start justify-between gap-4">
 
         {/* Info */}
         <div className="flex-1 min-w-0">
@@ -232,15 +180,21 @@ function FilaPromo({ item }: { item: ItemMenu }) {
           )}
         </div>
 
-        {/* Precio — proporcional, inline */}
-        <div className="text-right shrink-0 pt-0.5">
+        {/* Precio + día — columna derecha apilada */}
+        <div className="flex flex-col items-end gap-1.5 shrink-0 pt-0.5">
           {item.precioRegular && (
-            <p className="text-brand-cream/30 text-xs line-through leading-tight">L.{item.precioRegular}</p>
+            <p className="text-brand-cream/30 text-xs line-through leading-none">L.{item.precioRegular}</p>
           )}
           <p className="font-display leading-none"
             style={{ fontSize: '1.75rem', color: '#FF7050', textShadow: '0 0 14px rgba(193,18,31,0.5)' }}>
             L.{item.precio}
           </p>
+          {item.dia && (
+            <span className="font-display text-[10px] tracking-wider px-2.5 py-1 rounded-full"
+              style={{ background: 'rgba(193,18,31,0.14)', color: '#FF8060', border: '1px solid rgba(193,18,31,0.28)' }}>
+              {item.dia}
+            </span>
+          )}
         </div>
       </div>
     </div>
