@@ -52,7 +52,7 @@ export function HeroReveal() {
               ¿A las buenas…
             </h2>
             <h2 className="font-display text-[clamp(3rem,10vw,6rem)] text-brand-cream leading-[0.95] tracking-wider">
-              …o a las malas?
+              …o a las bravas?
             </h2>
           </div>
 
@@ -72,7 +72,7 @@ export function HeroReveal() {
               style={phase === 'burning' ? { animation: 'btn-ignite 0.42s ease 0.07s forwards' } : {}}
               className="px-10 py-4 rounded-full bg-brand-primary text-brand-cream font-display text-2xl tracking-widest hover:bg-red-700 transition-colors cursor-pointer"
             >
-              A LAS MALAS
+              A LAS BRAVAS
             </button>
           </div>
         </div>
