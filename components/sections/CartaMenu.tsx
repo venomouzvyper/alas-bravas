@@ -550,7 +550,7 @@ export function CartaMenu({ items, mostrarPreciosBebidas }: CartaMenuProps) {
 
       {/* ── Sección: Pupusas ─── */}
       <section id="sec-pupusas">
-        <SeccionHeader titulo="Pupusas" icon="🫓" tema="tierra" taglineOverride="Solo miércoles y jueves." />
+        <SeccionHeader titulo="Pupusas" icon="🫓" tema="tierra" taglineOverride="Disfrútalas todos los miércoles y jueves." />
         <div className="px-4 py-6 space-y-3" style={{ background: '#1A1000' }}>
           {cat('pupusas').map(i => <FilaItem key={i.id} item={i} mostrarPrecio tema="tierra" />)}
         </div>

@@ -6,7 +6,7 @@ Un hito no está completo hasta que su criterio de éxito está **verificado vis
 
 ## Estado actual
 - **Hito activo:** — (todos los hitos completados ✅)
-- **Última sesión:** Actualización del menú — Alitas Bravas, Chuleta Barbacoa, nuevas pupusas, ajustes de promos y pulido visual de /carta
+- **Última sesión:** Fix duplicados pupusas en Supabase + eslogan de sección actualizado en /carta
 
 ---
 
@@ -723,6 +723,54 @@ La barra flotante `fixed bottom-0` en `/menu` cubría el footer.
 - `components/sections/CartaMenu.tsx` — tagline brasa, título estático, precio dorado
 - `app/menu/page.tsx` — `PromoDia` sin "dom"
 - `supabase/update_valor_tags.sql` — SQL completo ejecutado ✅
+
+---
+
+## Sesión Fix Duplicados Pupusas y Eslogan ✅
+
+**Objetivo:** Identificar y corregir pupusas duplicadas en Supabase, y actualizar el eslogan de la sección en `/carta`.
+
+### Causa de los duplicados
+
+El INSERT del script `update_valor_tags.sql` usaba `ON CONFLICT DO NOTHING` sobre el primary key UUID (autogenerado). Como el UUID nunca colisiona, la cláusula nunca actúa — ejecutar el script dos veces insertó filas duplicadas para los 3 ítems nuevos.
+
+**Ítems afectados:**
+- `2 Pupusas de Quesillo` × 2
+- `2 Pupusas Mixtas` × 2
+- `3 Pupusas Mixtas` × 2
+
+Los originales (`3 Pupusas de Quesillo`, `3 Pupusas de Chicharrón`) no se duplicaron porque no formaban parte del INSERT problemático.
+
+### Fix en Supabase (ejecutar manualmente)
+
+SQL agregado al final de `supabase/update_valor_tags.sql`. Conserva la fila con menor `orden` / `created_at` y elimina la copia:
+
+```sql
+DELETE FROM menu_items
+WHERE id IN (
+  SELECT id FROM (
+    SELECT id,
+           ROW_NUMBER() OVER (
+             PARTITION BY nombre
+             ORDER BY orden ASC, created_at ASC
+           ) AS rn
+    FROM menu_items
+    WHERE categoria = 'pupusas'
+      AND nombre IN ('2 Pupusas de Quesillo', '2 Pupusas Mixtas', '3 Pupusas Mixtas')
+  ) sub
+  WHERE rn > 1
+);
+```
+
+### Eslogan sección Pupusas (`/carta`)
+
+- `components/sections/CartaMenu.tsx:553` — `taglineOverride` actualizado:
+  - Antes: `"Solo miércoles y jueves."`
+  - Ahora: `"Disfrútalas todos los miércoles y jueves."`
+
+### Archivos clave de esta sesión
+- `components/sections/CartaMenu.tsx` — eslogan de la sección Pupusas
+- `supabase/update_valor_tags.sql` — SQL de limpieza de duplicados (pendiente de ejecutar en Supabase)
 
 ---
 

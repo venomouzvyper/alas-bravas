@@ -84,3 +84,25 @@ UPDATE menu_items SET dia = 'Mié / Jue'
 UPDATE menu_items
   SET acompanamientos = ARRAY['Carne molida', 'Ensalada', 'Encurtido', 'Aderezo']
   WHERE nombre = '2 Órdenes de Tajadas';
+
+-- ═══════════════════════════════════════════════════════════════
+-- PENDIENTE DE EJECUTAR — Sesión Jun 2026 (fix duplicados pupusas)
+-- https://supabase.com/dashboard/project/dgacqokpfwrizgcivsbr/sql/new
+-- ═══════════════════════════════════════════════════════════════
+
+-- Eliminar filas duplicadas de pupusas (el INSERT previo se ejecutó dos veces).
+-- Conserva la fila con menor orden (la primera insertada) y borra las copias.
+DELETE FROM menu_items
+WHERE id IN (
+  SELECT id FROM (
+    SELECT id,
+           ROW_NUMBER() OVER (
+             PARTITION BY nombre
+             ORDER BY orden ASC, created_at ASC
+           ) AS rn
+    FROM menu_items
+    WHERE categoria = 'pupusas'
+      AND nombre IN ('2 Pupusas de Quesillo', '2 Pupusas Mixtas', '3 Pupusas Mixtas')
+  ) sub
+  WHERE rn > 1
+);
