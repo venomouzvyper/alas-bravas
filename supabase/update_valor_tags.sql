@@ -86,8 +86,7 @@ UPDATE menu_items
   WHERE nombre = '2 Órdenes de Tajadas';
 
 -- ═══════════════════════════════════════════════════════════════
--- PENDIENTE DE EJECUTAR — Sesión Jun 2026 (fix duplicados pupusas)
--- https://supabase.com/dashboard/project/dgacqokpfwrizgcivsbr/sql/new
+-- EJECUTADO ✅ — Sesión Jun 2026 (fix duplicados pupusas)
 -- ═══════════════════════════════════════════════════════════════
 
 -- Eliminar filas duplicadas de pupusas (el INSERT previo se ejecutó dos veces).
